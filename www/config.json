@@ -1,0 +1,37 @@
+{
+  "scripts": {
+    "opt": [
+      "home.js"
+    ],
+    "lib": [
+
+    ]
+  },
+  "stylesheets": [
+    "/css/opt/home.css",
+    "/css/opt/footer.css"
+  ],
+  "user": {
+    "required": false
+  },
+  "featured": {
+    "item-1": {
+      "img": "/img/F-coming-soon.png",
+      "title": "Sample Text",
+      "description": "Sample Text",
+      "link": "/"
+    },
+    "item-2": {
+      "img": "/img/F-coming-soon.png",
+      "title": "Sample Text",
+      "description": "Sample Text",
+      "link": "/"
+    },
+    "item-3": {
+      "img": "/img/F-coming-soon.png",
+      "title": "Sample Text",
+      "description": "Sample Text",
+      "link": "/"
+    }
+  }
+}

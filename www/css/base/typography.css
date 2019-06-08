@@ -1,6 +1,103 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+body
+{
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
 
-body {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: antialiased;
+}
+
+h1
+{
+    font-size: 6rem;
+    font-weight: 300;
+
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    letter-spacing: -.09375rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+h2
+{
+    font-size: 3.75rem;
+    font-weight: 300;
+
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    letter-spacing: -.03125rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+h3
+{
+    font-size: 3rem;
+    font-weight: 400;
+
+    letter-spacing: 0rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+h4
+{
+    font-size: 2.125rem;
+    font-weight: 400;
+
+    letter-spacing: .03125rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+h5
+{
+    font-size: 1.5rem;
+    font-weight: 400;
+
+    letter-spacing: 0rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+h6
+{
+    font-size: 1.25rem;
+    font-weight: 500;
+
+    letter-spacing: .009375rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+p
+{
+    font-size: 1rem;
+    font-weight: 400;
+
+    letter-spacing: .03125rem;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+button
+{
+    font-size: .875em;
+
+    letter-spacing: .03125rem;
+    text-transform: uppercase !important;
+    text-align: center;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+.subtext
+{
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+
+    color: #5f6368;
 }

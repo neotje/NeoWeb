@@ -1,61 +1,149 @@
+// hide body
+$("html").hide();
+
 const scriptManager = new function() {
+  var onloadCallbacks = [
+    function() {
+      console.log("test");
+    }
+  ]
+
   var baseScriptsURL = "/js/base/";
   var optScriptsURL = "/js/opt/";
   var libScriptsURL = "/js/lib/";
 
   var baseScriptsToLoad = [
-    "topMenu.js"
+    "topMenu.js",
+    "user.js"
   ];
   var libScriptsToLoad = [
-    "anime.js"
+    "anime.js",
+    "firebase.js"
   ];
-  var styleSheetsToLoad =[
+  var CDNscriptsToload = [
+    "https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js",
+    "https://www.gstatic.com/firebasejs/6.1.1/firebase-auth.js",
+    "https://www.gstatic.com/firebasejs/6.1.1/firebase-firestore.js"
+  ]
+  var styleSheetsToLoad = [
+    "https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap",
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
     "/css/base/color.css",
     "/css/base/typography.css",
-    "/css/base/normalize.css"
+    "/css/base/normalize.css",
+    "/css/base/topMenu.css"
   ]
 
-  function load() {
-    // load base script.
-    for (script of baseScriptsToLoad) {
-      $.getScript(baseScriptsURL + script)
-        .done(function() {
-          console.log("Loaded: " + script);
-        })
-        .fail(function() {
-          console.error("Failed to load: " + script);
-        })
-    }
-
-    // load lib scripts
-    for (script of libScriptsToLoad) {
-      $.getScript(libScriptsURL + script)
-        .done(function() {
-          console.log("Loaded: " + script);
-        })
-        .fail(function() {
-          console.error("Failed to load: " + script);
-        })
-    }
-
-    for (url of styleSheetsToLoad) {
-      var link = document.createElement("link");
-      link.href = url;
-      link.type = "text/css";
-      link.rel = "stylesheet";
-
-      document.getElementsByTagName("head")[0].appendChild(link);
+  function dispatchOnloadEvent() {
+    console.log("event happened");
+    console.log(onloadCallbacks);
+    for (callback of onloadCallbacks) {
+      callback();
     }
   }
 
-  load();
+  function load() {
+    let This = this;
 
-  this.onload = function() {}
+    // disable ajax async function.
+    $.ajaxSetup({
+      async: true
+    });
+    var urlList = []
+
+    $.getJSON(window.location.pathname + "config.json", function(data) {
+        // load stylesheets
+        for (url of styleSheetsToLoad.concat(data.stylesheets)) {
+          var link = document.createElement("link");
+          link.href = url;
+          link.type = "text/css";
+          link.rel = "stylesheet";
+
+          document.getElementsByTagName("head")[0].appendChild(link);
+          console.log("Loaded stylesheet: ", url);
+        }
+
+        // add cdn script to list
+        for (script of CDNscriptsToload) {
+          urlList.push(script);
+        }
+        // add lib scripts to list
+        for (script of libScriptsToLoad) {
+          urlList.push(libScriptsURL + script);
+        }
+        // add lib scripts defined in config
+        for (script of data.scripts.lib) {
+          urlList.push(libScriptsURL + script)
+        }
+        // add base script to list
+        for (script of baseScriptsToLoad) {
+          urlList.push(baseScriptsURL + script);
+        }
+        // add opt script to list
+        for (script of data.scripts.opt) {
+          urlList.push(optScriptsURL + script);
+        }
+
+        var gets = [];
+
+        $.each(urlList, function(i) {
+          gets.push($.getScript(this));
+        });
+
+        $.when.apply($, gets).then(dispatchOnloadEvent);
+      })
+      .fail(function() {
+        // load stylesheets
+        for (url of styleSheetsToLoad) {
+          var link = document.createElement("link");
+          link.href = url;
+          link.type = "text/css";
+          link.rel = "stylesheet";
+
+          document.getElementsByTagName("head")[0].appendChild(link);
+          console.log("Loaded stylesheet: ", url);
+        }
+
+        // add cdn script to list
+        for (script of CDNscriptsToload) {
+          urlList.push(script);
+        }
+        // add lib scripts to list
+        for (script of libScriptsToLoad) {
+          urlList.push(libScriptsURL + script);
+        }
+        // add base script to list
+        for (script of baseScriptsToLoad) {
+          urlList.push(baseScriptsURL + script);
+        }
+
+        $.each(urlList, function(i) {
+          gets.push($.getScript(this));
+        });
+
+        $.when.apply($, gets).then(dispatchOnloadEvent);
+      });
+
+    // reset ajaxSetup
+    $.ajaxSetup({
+      async: true
+    });
+  }
+
+  this.onload = function(callback) {
+    onloadCallbacks.push(callback);
+  }
 
   this.reload = function() {
+    // hide body
+    $("html").hide();
+
     load();
 
-    this.onload();
+    this.onload(function() {
+      // show body
+      $("html").show();
+    });
   }
 
   this.loadOptScript = function(script, callback = function() {}) {
@@ -86,3 +174,5 @@ const scriptManager = new function() {
     document.getElementsByTagName("head")[0].appendChild(link);
   }
 }
+
+scriptManager.reload();
