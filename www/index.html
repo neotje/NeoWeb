@@ -6,23 +6,79 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <title>NeoHub</title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
 
   <!-- STYLESHEETS -->
 
   <!-- SCRIPTS -->
   <!-- lib -->
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyBshVsKztLIRLbwmLELrOZbp7J5Wp0ufqg",
+      authDomain: "neohub-7fdd1.firebaseapp.com",
+      databaseURL: "https://neohub-7fdd1.firebaseio.com",
+      projectId: "neohub-7fdd1",
+      storageBucket: "neohub-7fdd1.appspot.com",
+      messagingSenderId: "472880578942",
+      appId: "1:472880578942:web:58e4e22c00d99bc6"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
   <script src="/js/lib/jquery.js" charset="utf-8"></script>
+  <script src="/js/lib/anime.js" charset="utf-8"></script>
   <!-- BASE scripts -->
-  <script src="/js/scriptManager.js" charset="utf-8"></script>
+  <script src="/js/base/topMenu.js" charset="utf-8"></script>
+  <script src="/js/base/user.js" charset="utf-8"></script>
+  <!-- OPT scripts -->
+  <script src="/js/opt/home.js" charset="utf-8"></script>
 
   <!-- CSS -->
+  <!-- base css -->
+  <link rel="stylesheet" href="/css/base/normalize.css">
+  <link rel="stylesheet" href="/css/base/typography.css">
+  <link rel="stylesheet" href="/css/base/color.css">
+  <link rel="stylesheet" href="/css/base/topMenu.css">
+  <link rel="stylesheet" href="/css/base/user.css">
+  <!-- opt css -->
+  <link rel="stylesheet" href="/css/opt/footer.css">
+  <link rel="stylesheet" href="/css/opt/home.css">
+
 </head>
 
 <body>
+  <div id="user">
+    <div class="container">
+      <div class="topMenu">
+        <button class="login">Login</button>
+        <button class="register">Register</button>
+      </div>
+      <div class="forms">
+        <div class="login">
+          <input type="email" placeholder="E-mail">
+          <input type="password" placeholder="Password">
+        </div>
+        <div class="register">
+          <input type="email" placeholder="E-mail">
+          <input type="password" placeholder="Password">
+          <input type="password" placeholder="Repeat password">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="topMenu">
     <div class="title" onclick="window.location.href = '/'">
       <img src="/img/icon.png">
       <p>NEOHUB</p>
+    </div>
+    <button class="btn authBtn" type="button">Register / Login</button>
+    <div class="user">
     </div>
   </div>
 

@@ -1,16 +1,4 @@
 {
-  "scripts": {
-    "opt": [
-      "home.js"
-    ],
-    "lib": [
-
-    ]
-  },
-  "stylesheets": [
-    "/css/opt/home.css",
-    "/css/opt/footer.css"
-  ],
   "user": {
     "required": false
   },

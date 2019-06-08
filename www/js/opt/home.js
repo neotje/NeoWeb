@@ -25,10 +25,8 @@ $(window).resize(function() {
 
 $(document).ready(function() {
   home.genFeatured();
-});
-
-scriptManager.onload(function() {
   home.genSize();
+
   anime({
     targets: "#home .cover img",
     duration: 3000,
