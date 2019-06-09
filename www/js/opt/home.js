@@ -14,6 +14,11 @@ const home = new function() {
           var title = fData.featured[item].title;
           var elem = $("#home .container .featured .items ." + item);
 
+          if (title == "") {
+            elem.hide();
+            continue;
+          }
+
           console.log(title);
 
           var props = pData.projects[title];

@@ -74,6 +74,18 @@
   margin: .5em 1em;
 }
 
+#topMenu .center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: inline-block;
+
+  height: inherit;
+
+  transform: translate(-50%, -50%);
+}
+
 #topMenu .authBtn,
 #topMenu .authCloseBtn {
   margin-right: 2rem;
