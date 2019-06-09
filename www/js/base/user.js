@@ -11,8 +11,6 @@ firebase.auth().onAuthStateChanged(function(user) {
 });
 
 $(document).ready(function() {
-  $("#topMenu .authBtn").hide();
-  $("#topMenu .user").hide();
   $("#user").hide();
 
   $("#user .container .topMenu .login").click(function() {
@@ -32,20 +30,28 @@ const user = new function() {
       $("#user .container .topMenu .login").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .register").css("border-bottom-color", "white");
 
-      $("#user .container .forms .register").hide();
-      $("#user .container .forms .login").show();
+      $("#user .container .forms .register").hide(300, function() {
+        $("#user .container .forms .login").show(300);
+      });
     }
     if (form == "register") {
       $("#user .container .topMenu .register").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .login").css("border-bottom-color", "white");
 
-      $("#user .container .forms .login").hide();
-      $("#user .container .forms .register").show();
+      $("#user .container .forms .login").hide(300, function() {
+        $("#user .container .forms .register").show(300);
+      });
     }
   }
 
   this.showAuthForm = function() {
     This.formSwitchTo("login");
-    $("#user").show();
+    $("#user").show(300);
+    topMenu.showTopMenuCloseAuthBtn();
+  }
+
+  this.hideAuthForm = function() {
+    $("#user").hide(300);
+    topMenu.showTopMenuAuthBtn();
   }
 }

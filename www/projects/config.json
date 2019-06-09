@@ -1,0 +1,28 @@
+{
+  "user": {
+    "required": false
+  },
+  "projects": {
+    "Geometry wars": {
+      "img": "/img/F-coming-soon.png",
+      "description": "Geometry wars is a 2D shooter, where you need to defend yourself.",
+      "link": "/GeometryWars"
+    },
+    "Sample Text 2": {
+      "img": "/img/F-coming-soon.png",
+      "description": "Sample Text",
+      "link": "/"
+    },
+    "Sample Text 3": {
+      "img": "/img/F-coming-soon.png",
+      "description": "Sample Text",
+      "link": "/"
+    },
+    "Sample Text 4": {
+      "img": "/img/F-coming-soon.png",
+      "description": "Sample Text",
+      "link": "/"
+    }
+
+  }
+}

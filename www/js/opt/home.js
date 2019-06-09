@@ -5,16 +5,25 @@ const home = new function() {
   }
 
   this.genFeatured = function() {
-    $.getJSON("./config.json", function(data) {
-      for (let item in data.featured) {
-        var props = data.featured[item];
-        var elem = $("#home .container .featured .items ." + item);
+    $.getJSON("./config.json", function(FeaturedData) {
+      let fData = FeaturedData;
+      $.getJSON("/projects/config.json", function(ProjectsData) {
+        let pData = ProjectsData;
 
-        elem.attr("onclick", "window.location.href = '" + props.link + "'")
-        elem.children("img").attr("src", props.img);
-        elem.children("h6").text(props.title);
-        elem.children("p").text(props.description);
-      }
+        for (let item in fData.featured) {
+          var title = fData.featured[item].title;
+          var elem = $("#home .container .featured .items ." + item);
+
+          console.log(title);
+
+          var props = pData.projects[title];
+
+          elem.attr("onclick", "window.location.href = '" + props.link + "'")
+          elem.children("img").attr("src", props.img);
+          elem.children("h6").text(title);
+          elem.children("p").text(props.description);
+        }
+      });
     });
   }
 }

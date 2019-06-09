@@ -4,22 +4,13 @@
   },
   "featured": {
     "item-1": {
-      "img": "/img/F-coming-soon.png",
-      "title": "Sample Text",
-      "description": "Sample Text",
-      "link": "/"
+      "title": "Geometry wars"
     },
     "item-2": {
-      "img": "/img/F-coming-soon.png",
-      "title": "Sample Text",
-      "description": "Sample Text",
-      "link": "/"
+      "title": "Sample Text 2"
     },
     "item-3": {
-      "img": "/img/F-coming-soon.png",
-      "title": "Sample Text",
-      "description": "Sample Text",
-      "link": "/"
+      "title": "Sample Text 3"
     }
   }
 }
