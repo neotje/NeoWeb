@@ -97,3 +97,68 @@
 #topMenu .authCloseBtn {
   float: right;
 }
+
+#topMenu .user {
+  height: inherit;
+  padding: 0;
+
+  transition: all .3s cubic-bezier(.25, .8, .25, 1);
+}
+
+#topMenu .user img {
+  height: 2.5rem;
+  margin: .5rem;
+
+  border-radius: 50%;
+}
+
+#topMenu .user img:hover {
+  height: 2.5rem;
+  margin: .5rem;
+
+  transition: all .3s cubic-bezier(.25, .8, .25, 1);
+
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .24);
+}
+
+#topMenu .user .content {
+  position: absolute;
+  right: 0;
+
+  display: none;
+  float: right;
+
+  height: 0;
+
+  transition: all .3s cubic-bezier(.25, .8, .25, 1);
+
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .24);
+
+}
+
+#topMenu .user:hover .content {
+  top: 3.5rem;
+
+  display: block;
+
+  height: auto;
+}
+
+#topMenu .user .content button {
+  display: block;
+
+  width: inherit;
+  padding: .5rem;
+
+  transition: all .3s cubic-bezier(.25, .8, .25, 1);
+
+  color: #565656;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+#topMenu .user .content button:hover {
+  color: black;
+}

@@ -39,6 +39,20 @@ const user = new function() {
     });
   }
 
+  this.logout = function() {
+    firebase.auth().signOut().then(function() {
+      $.getJSON("./config.json", function(data) {
+        if (data.user.required) {
+          window.location.href = "/";
+        } else {
+          window.location.href = window.location.pathname;
+        }
+      });
+    }).catch(function(error) {
+
+    });
+  }
+
   this.register = function() {
     var email = $("#user .container .forms .register .email").val();
     var password = $("#user .container .forms .register .password").val();
