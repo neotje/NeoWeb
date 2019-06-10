@@ -4,14 +4,16 @@
     <button class="register">Register</button>
   </div>
   <div class="forms">
-    <div class="login">
-      <input type="email" placeholder="E-mail">
-      <input type="password" placeholder="Password">
-    </div>
-    <div class="register">
-      <input type="email" placeholder="E-mail">
-      <input type="password" placeholder="Password">
-      <input type="password" placeholder="Repeat password">
-    </div>
+    <form class="login">
+      <input class="email" type="email" placeholder="E-mail" required autocomplete="email">
+      <input class="password" type="password" placeholder="Password" required autocomplete="current-password">
+      <button id="loginSubmitBtn" class="submitBtn material-icons" type="submit">check</button>
+    </form>
+    <form class="register">
+      <input class="email" type="email" placeholder="E-mail" required autocomplete="email">
+      <input class="password" type="password" placeholder="Password" required autocomplete="new-password">
+      <input class="rPassword" type="password" placeholder="Repeat password" required autocomplete="new-password">
+      <button id="registerSubmitBtn" class="submitBtn material-icons" type="submit">check</button>
+    </form>
   </div>
 </div>

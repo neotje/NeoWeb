@@ -1,6 +1,7 @@
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     topMenu.showTopMenuUser();
+    topMenu.showTopMenuUser();
   } else {
     $.getJSON("./config.json", function(data) {
       if (data.user.required == false) {
@@ -15,8 +16,14 @@ $(document).ready(function() {
   $("#topMenu .authCloseBtn").hide();
   $("#topMenu .user").hide();
 
-  $("#topMenu .authBtn").click(user.showAuthForm);
-  $("#topMenu .authCloseBtn").click(user.hideAuthForm);
+  $("#topMenu .authBtn").click(function() {
+    topMenu.showTopMenuCloseAuthBtn();
+    user.showAuthForm();
+  });
+  $("#topMenu .authCloseBtn").click(function() {
+    user.hideAuthForm();
+    topMenu.showTopMenuAuthBtn();
+  });
 });
 
 const topMenu = new function() {
