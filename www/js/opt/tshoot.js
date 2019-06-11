@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $("#tshoot canvas").hide();
+  $("#tshoot .game").hide();
 
   canvas = document.getElementById("tshootCanvas");
   ctx = canvas.getContext("2d");
@@ -24,19 +24,19 @@ var deltaTime;
 
 var keys = {
   up: {
-    key: "ArrowUp",
+    key: "w",
     pressed: false
   },
   down: {
-    key: "ArrowDown",
+    key: "s",
     pressed: false
   },
   left: {
-    key: "ArrowLeft",
+    key: "a",
     pressed: false
   },
   right: {
-    key: "ArrowRight",
+    key: "d",
     pressed: false
   },
   exit: {
@@ -130,44 +130,60 @@ var enemys = {
       this.y;
       this.level = level;
       this.rotate = 0;
-      this.rotateSpeed = Math.PI / 5;
+      this.rotateSpeed = Math.PI / 3;
       this.speed = 125;
       this.radius = 20;
 
       this.draw = function() {
+        // calculate angle toward player
         var angle = Math.atan2((player.y - this.y), (player.x - this.x));
+
+        // calculate new position
         var Dx = this.speed * Math.cos(angle);
         var Dy = this.speed * Math.sin(angle);
         this.x += Dx * deltaTime;
         this.y += Dy * deltaTime;
+
+        // detect collision with player
+        if (circleCollision(player.x, player.y, player.radius, this.x, this.y, this.radius)) {
+          level -= 1;
+        }
+        // apply rotation
         this.rotate += this.rotateSpeed * deltaTime;
 
         genShape(this.x, this.y, this.radius, level + 2, this.rotate);
       }
     }
-
-    var spawnSide = randomNumber(1, 4);
-    console.log(spawnSide);
-
-    if (spawnSide == 1) {
-      e.x = -50;
-      e.y = randomNumber(0, canvas.height);
-    }
-    if (spawnSide == 2) {
-      e.y = -50;
-      e.x = randomNumber(0, canvas.width);
-    }
-    if (spawnSide == 3) {
-      e.x = canvas.width + 50;
-      e.y = randomNumber(0, canvas.height);
-    }
-    if (spawnSide == 3) {
-      e.y = canvas.height + 50;
-      e.x = randomNumber(0, canvas.width);
-    }
-
     enemys.list.push(e);
+  },
+  draw: function() {
+    for (var i = 0; i < enemys.list.length; i++) {
+      enemys.list[i].draw();
+      if (enemys.list[i].level == 0) {
+        enemys.splice(i, 1);
+      }
+    }
   }
+}
+
+var spawnSide = randomNumber(1, 4);
+console.log(spawnSide);
+
+if (spawnSide == 1) {
+  e.x = -50;
+  e.y = randomNumber(0, canvas.height);
+}
+if (spawnSide == 2) {
+  e.y = -50;
+  e.x = randomNumber(0, canvas.width);
+}
+if (spawnSide == 3) {
+  e.x = canvas.width + 50;
+  e.y = randomNumber(0, canvas.height);
+}
+if (spawnSide == 3) {
+  e.y = canvas.height + 50;
+  e.x = randomNumber(0, canvas.width);
 }
 
 function genShape(x, y, r, s, rotate = 0, color = "white") {
@@ -186,6 +202,18 @@ function randomNumber(min, max) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
+function circleCollision(x1, y1, r1, x2, y2, r2) {
+  var dx = x1 - x2;
+  var dy = y1 - y2;
+  var distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < r1 + r2) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function singePlayerDraw(time) {
   currentTime = performance.now();
   deltaTime = (currentTime - lastTime) / 1000;
@@ -195,7 +223,7 @@ function singePlayerDraw(time) {
     stopSingleplayer();
   }
   if (stopGame) {
-    stopGame == false;
+    stopGame = false;
     return;
   }
 
@@ -203,14 +231,22 @@ function singePlayerDraw(time) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
-  for (e of enemys.list) {
-    e.draw();
-  }
+  enemys.draw();
   //genShape(100, 100, 20, 2, 1);
   window.requestAnimationFrame(singePlayerDraw);
 }
 
+function resetSinglePlayer() {
+  enemys.list = [];
+  player.x = 360;
+  player.y = 240;
+  player.angle = 0;
+  player.lives = 3;
+}
+
 function startSingleplayer() {
+  resetSinglePlayer();
+
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
   canvas.addEventListener("click", function(evt) {
@@ -219,7 +255,7 @@ function startSingleplayer() {
   canvas.addEventListener("mousemove", mouse.update, false);
 
   $("#tshoot .menu").hide(function() {
-    $("#tshoot canvas").show(function() {
+    $("#tshoot .game").show(function() {
       lastTime = performance.now();
       window.requestAnimationFrame(singePlayerDraw);
     });
@@ -235,7 +271,7 @@ function stopSingleplayer() {
   canvas.removeEventListener("mousemove", mouse.update);
 
 
-  $("#tshoot canvas").hide(300, function() {
+  $("#tshoot .game").hide(300, function() {
     $("#tshoot .menu").show(300);
   });
 }
