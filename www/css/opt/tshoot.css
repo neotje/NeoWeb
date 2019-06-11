@@ -1,0 +1,67 @@
+:root {
+  --background-color: black;
+  --text-color: white;
+  --btn-bg-color: white;
+  --btn-text-color: black;
+}
+
+#tshoot {
+  margin-top: 3.5rem;
+}
+
+#tshoot .menu,
+#tshoot canvas {
+  position: relative;
+  left: 50%;
+
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+
+  transform: translateX(-50%);
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+}
+
+#tshoot .menu {
+  width: 720px;
+  height: 480px;
+  padding: 1rem;
+
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+#tshoot .menu h3 {
+  text-align: center;
+}
+
+#tshoot .menu button {
+  display: block;
+
+  width: 100%;
+  padding: .5rem 1rem;
+
+  text-align: center;
+
+  color: var(--btn-text-color);
+  border: none;
+  background-color: var(--btn-bg-color);
+}
+
+#tshoot .menu .list button:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+#tshoot .menu button:hover {
+  background-color: whitesmoke;
+}
+
+#tshoot .menu .list {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: block;
+
+  transform: translate(-50%, -50%);
+}
