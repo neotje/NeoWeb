@@ -3,7 +3,7 @@ $(document).ready(function() {
 
   canvas = document.getElementById("tshootCanvas");
   ctx = canvas.getContext("2d");
-  ctx.imageSmoothingQuality = "hight";
+  ctx.imageSmoothingQuality = "high";
 });
 
 window.addEventListener("keydown", function(e) {
@@ -64,7 +64,7 @@ function keyUpHandler(e) {
 }
 
 function mouseClickHandler() {
-
+  bullets.add(player.angle);
 }
 
 var mouse = {
@@ -86,15 +86,32 @@ function getMousePos(canvas, evt) {
 }
 
 var player = {
-  x: 360,
-  y: 240,
+  x: 0,
+  y: 0,
   angle: 0,
   radius: 20,
   speed: 200,
+  score: 0,
+  level: 0,
+  lastscore: 0,
+  nextscore: 1,
   lives: 3,
+  color: "white",
   draw: function() {
+    // game info text
+    $("#tshoot .game .info .lives").text(player.lives);
+    $("#tshoot .game .info .score").text(player.score);
+    $("#tshoot .game .info .level").text(player.level);
     // calculating
     player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+
+    if (player.nextscore == player.score) {
+      player.level += 1;
+      player.lastscore = player.nextscore;
+      player.nextscore = player.nextscore * 2;
+
+      enemys.spawn();
+    }
 
     // movement
     if (keys.up.pressed && player.y > player.radius) {
@@ -113,10 +130,18 @@ var player = {
 
     // drawing
     ctx.beginPath();
+    ctx.strokeStyle = player.color;
+    ctx.lineWidth = 2;
     ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.closePath();
+
+    // gun
+    ctx.beginPath();
+    ctx.strokeStyle = player.color;
+    ctx.lineWidth = 4;
     ctx.moveTo(player.x + (Math.cos(player.angle) * 10), player.y + (Math.sin(player.angle) * 10));
     ctx.lineTo(player.x + (Math.cos(player.angle) * 30), player.y + (Math.sin(player.angle) * 30))
-    ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.closePath();
   }
@@ -130,8 +155,8 @@ var enemys = {
       this.y;
       this.level = level;
       this.rotate = 0;
-      this.rotateSpeed = Math.PI / 3;
-      this.speed = 125;
+      this.rotateSpeed = Math.PI / (this.level / 4);
+      this.speed = 95 * Math.pow(0.8, this.level) + 30;
       this.radius = 20;
 
       this.draw = function() {
@@ -146,49 +171,151 @@ var enemys = {
 
         // detect collision with player
         if (circleCollision(player.x, player.y, player.radius, this.x, this.y, this.radius)) {
-          level -= 1;
+          player.score += this.level;
+          this.level = 0;
+          player.lives -= 1;
         }
         // apply rotation
         this.rotate += this.rotateSpeed * deltaTime;
 
-        genShape(this.x, this.y, this.radius, level + 2, this.rotate);
+        genShape(this.x, this.y, this.radius, this.level + 2, this.rotate);
       }
     }
+
+    // generate spawn side
+    var spawnSide = randomNumber(1, 4);
+    //console.log("spawn", spawnSide);
+
+    if (spawnSide == 1) {
+      e.x = -50;
+      e.y = randomNumber(0, canvas.height);
+    }
+    if (spawnSide == 2) {
+      e.y = -50;
+      e.x = randomNumber(0, canvas.width);
+    }
+    if (spawnSide == 3) {
+      e.x = canvas.width + 50;
+      e.y = randomNumber(0, canvas.height);
+    }
+    if (spawnSide == 4) {
+      e.y = canvas.height + 50;
+      e.x = randomNumber(0, canvas.width);
+    }
+
+    // add new enemy to enemys list
     enemys.list.push(e);
   },
   draw: function() {
+    // draw every enemy
     for (var i = 0; i < enemys.list.length; i++) {
       enemys.list[i].draw();
+
+      // check if enemy level is 0
       if (enemys.list[i].level == 0) {
-        enemys.splice(i, 1);
+        enemys.list.splice(i, 1);
+      }
+    }
+  },
+  spawn: function() {
+    //console.log("nextScore", player.nextscore);
+    var levels = genRandomNumbers(1, player.level, player.nextscore - player.lastscore);
+    //console.log("total", total(levels));
+    //console.log("delta", player.nextscore - player.lastscore);
+    for (level of levels) {
+      enemys.add(level);
+    }
+  }
+}
+
+var bullets = {
+  list: [],
+  add: function(angle) {
+    var b = new function() {
+      this.x = player.x + (Math.cos(player.angle) * 25);
+      this.y = player.y + (Math.sin(player.angle) * 25);
+      this.angle = angle;
+      this.speed = 400;
+      this.destroy = false;
+
+      this.dx = this.speed * Math.cos(this.angle);
+      this.dy = this.speed * Math.sin(this.angle);
+
+
+      this.draw = function() {
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.destroy = true;
+        }
+
+        for (enemy of enemys.list) {
+          if (circleCollision(this.x, this.y, 1, enemy.x, enemy.y, enemy.radius)) {
+            enemy.level -= 1;
+
+            enemy.speed = 95 * Math.pow(0.8, enemy.level) + 30;
+            enemy.rotateSpeed = Math.PI / (enemy.level / 4);
+
+            player.score += 1;
+            this.destroy = true
+          }
+        }
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - (Math.cos(this.angle) * 15), this.y - (Math.sin(this.angle) * 15));
+        ctx.strokeStyle = "red";
+        ctx.stroke();
+        ctx.closePath();
+
+        this.x += this.dx * deltaTime;
+        this.y += this.dy * deltaTime;
+      }
+    }
+
+    bullets.list.push(b);
+  },
+  draw: function() {
+    for (var i = 0; i < bullets.list.length; i++) {
+      var bullet = bullets.list[i];
+
+      bullet.draw();
+
+      if (bullet.destroy) {
+        bullets.list.splice(i, 1);
       }
     }
   }
 }
 
-var spawnSide = randomNumber(1, 4);
-console.log(spawnSide);
+function total(list) {
+  var t = 0;
+  for (num of list) {
+    t += num;
+  }
+  return t;
+}
 
-if (spawnSide == 1) {
-  e.x = -50;
-  e.y = randomNumber(0, canvas.height);
-}
-if (spawnSide == 2) {
-  e.y = -50;
-  e.x = randomNumber(0, canvas.width);
-}
-if (spawnSide == 3) {
-  e.x = canvas.width + 50;
-  e.y = randomNumber(0, canvas.height);
-}
-if (spawnSide == 3) {
-  e.y = canvas.height + 50;
-  e.x = randomNumber(0, canvas.width);
+function genRandomNumbers(min, max, sum) {
+  var numbers = [];
+  var loop = true;
+
+  while (loop) {
+    numbers.push(randomNumber(min, max));
+
+    if (total(numbers) > sum) {
+      numbers.pop();
+    }
+    if (total(numbers) == sum) {
+      loop = false;
+    }
+  }
+  return numbers;
 }
 
 function genShape(x, y, r, s, rotate = 0, color = "white") {
   sRadius = (Math.PI * 2) / s;
   ctx.beginPath();
+  ctx.lineWidth = 2;
   ctx.moveTo(x + (Math.cos(0 + rotate) * r), y + (Math.sin(0 + rotate) * r));
   for (var i = 1; i <= s; i++) {
     ctx.lineTo(x + (Math.cos(i * sRadius + rotate) * r), y + (Math.sin(i * sRadius + rotate) * r));
@@ -214,12 +341,21 @@ function circleCollision(x1, y1, r1, x2, y2, r2) {
   }
 }
 
+function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+  if (x1 < x2 + w2 && x2 < x1 + w1 && y1 < y2 + h2 && y2 < y1 + h1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function singePlayerDraw(time) {
   currentTime = performance.now();
   deltaTime = (currentTime - lastTime) / 1000;
   lastTime = currentTime;
 
   if (keys.exit.pressed) {
+    keys.exit.pressed = false;
     stopSingleplayer();
   }
   if (stopGame) {
@@ -227,21 +363,27 @@ function singePlayerDraw(time) {
     return;
   }
 
-  //ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  bullets.draw();
   player.draw();
   enemys.draw();
-  //genShape(100, 100, 20, 2, 1);
+
   window.requestAnimationFrame(singePlayerDraw);
 }
 
 function resetSinglePlayer() {
   enemys.list = [];
-  player.x = 360;
-  player.y = 240;
+  bullets.list = [];
+  player.x = canvas.width / 2;
+  player.y = canvas.height / 2;
   player.angle = 0;
   player.lives = 3;
+  player.score = 0;
+  player.level = 1;
+  player.lastscore = 0;
+  player.nextscore = 1;
 }
 
 function startSingleplayer() {
@@ -249,13 +391,12 @@ function startSingleplayer() {
 
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
-  canvas.addEventListener("click", function(evt) {
-    mouse.update(evt);
-  }, false)
+  canvas.addEventListener("mousedown", mouseClickHandler, false)
   canvas.addEventListener("mousemove", mouse.update, false);
 
   $("#tshoot .menu").hide(function() {
     $("#tshoot .game").show(function() {
+      enemys.spawn();
       lastTime = performance.now();
       window.requestAnimationFrame(singePlayerDraw);
     });
