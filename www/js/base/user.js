@@ -1,6 +1,13 @@
 const user = new function() {
+  var db = firebase.firestore();
   let This = this;
-  this.current;
+  this.current = function() {
+    return firebase.auth().currentUser;
+  }
+
+  this.doc = function() {
+    return db.collection('users').doc(this.current().uid);
+  }
 
   this.formSwitchTo = function(form) {
     if (form == "login") {
@@ -70,7 +77,7 @@ const user = new function() {
 
 firebase.auth().onAuthStateChanged(function(loginUser) {
   if (loginUser) {
-    user.currrent = loginUser
+    user.currrent = loginUser;
     user.hideAuthForm();
 
     if (loginUser.emailVerified == false) {
