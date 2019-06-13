@@ -285,6 +285,7 @@ const game = new function() {
   this.fps;
   this.score;
   this.userName = "";
+  this.action = "";
 
   this.entities = [];
 
@@ -395,9 +396,15 @@ const game = new function() {
   }
 
   this.stop = function() {
-    var score;
-
     stop = true;
+
+    for (let entity of game.entities) {
+      if (entity.type == "player" && entity.ID == user.current().uid) {
+        game.score = entity.score
+      }
+    }
+
+    menu.gotoGameOver(game.score, game.userName);
   }
 
   this.loop = function() {
@@ -442,6 +449,13 @@ const menu = new function() {
     }
 
     game.userName = menu.userData.name;
+
+    game.ctx.imageSmoothingQuality = menu.userData.graphics;
+  }
+
+  this.uploadConf = function(callback = function() {}) {
+    user.doc().collection("tshoot").doc("settings").update(menu.userData)
+      .then(callback);
   }
 
   this.checkUser = function() {
@@ -450,10 +464,11 @@ const menu = new function() {
     user.doc().collection("tshoot").doc("settings").get().then(function(doc) {
       var obj = doc.data();
 
-      if (obj == undefined || obj.highscore == undefined || obj.keys == undefined) {
+      if (obj == undefined || obj.highscore == undefined || obj.keys == undefined || obj.graphics == undefined) {
         user.doc().collection("tshoot").doc("settings").set({
           name: null,
           highscore: 0,
+          graphics: "high",
           keys: {
             up: "w",
             down: "s",
@@ -479,12 +494,46 @@ const menu = new function() {
     }).then(callback);
   }
 
+  this.getKey = function(action) {
+    menu.action = action;
+
+    for (let action in this.userData.keys) {
+      $("#tshoot .menu .controls .list ." + menu.action + " button").text(this.userData.keys[action]);
+    }
+
+    $("#tshoot .menu .controls .list ." + menu.action + " button").text("...");
+
+    function updateKeyConf(e) {
+      menu.userData.keys[menu.action] = e.key;
+      menu.uploadConf();
+      $("#tshoot .menu .controls .list ." + menu.action + " button").text(e.key);
+      document.removeEventListener("keyup", updateKeyConf);
+    }
+
+    document.addEventListener("keyup", updateKeyConf, false);
+  }
+
   this.gotoMain = function() {
     $("#tshoot .menu .setName").hide();
+    $("#tshoot .menu .controls").hide();
     $("#tshoot .menu .main").show();
   }
   this.gotoSetName = function() {
     $("#tshoot .menu .setName").show();
+    $("#tshoot .menu .controls").hide();
     $("#tshoot .menu .main").hide();
+  }
+  this.gotoControls = function() {
+    try {
+      document.removeEventListener("keyup", updateKeyConf);
+    } catch (e) {}
+
+    $("#tshoot .menu .setName").hide();
+    $("#tshoot .menu .controls").show();
+    $("#tshoot .menu .main").hide();
+
+    for (let action in this.userData.keys) {
+      $("#tshoot .menu .controls .list ." + action + " button").text(this.userData.keys[action]);
+    }
   }
 }

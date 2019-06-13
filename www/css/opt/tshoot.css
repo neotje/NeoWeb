@@ -50,8 +50,22 @@
   margin-bottom: 1rem;
 }
 
+#tshoot .menu .list p:not(:last-child), {
+  margin-bottom: 2rem;
+}
+
 #tshoot .menu button:hover {
   background-color: whitesmoke;
+}
+
+#tshoot .menu .back {
+  position: absolute;
+  bottom: 3rem;
+  left: 3rem;
+
+  width: auto;
+
+  font-size: 2rem;
 }
 
 #tshoot .menu .list {
@@ -62,6 +76,14 @@
   display: block;
 
   transform: translate(-50%, -50%);
+}
+
+#tshoot .menu .list p button {
+  display: inline-block;
+  float: right;
+
+  width: auto;
+  margin-left: 0.5rem;
 }
 
 #tshoot .menu .setName input {

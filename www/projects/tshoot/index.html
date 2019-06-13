@@ -67,16 +67,29 @@
       <div class="main">
         <h3>Tshoot</h3>
         <div class="list">
-          <button type="button" onclick="startSingleplayer();">Singleplayer</button>
-          <button type="button">Scoreboard</button>
-          <button type="button">Controls</button>
+          <button type="button" onclick="game.start();">Singleplayer</button>
+          <button type="button" onclick="">Scoreboard</button>
+          <button type="button" onclick="menu.gotoControls();">Controls</button>
           <button type="button">Settings</button>
         </div>
       </div>
+
       <form class="setName">
         <h3>Please Set Player Name</h3>
         <input type="text" required autocomplete="nickname">
       </form>
+
+      <div class="controls">
+        <h3>Controls</h3>
+        <div class="list">
+          <p class="up">Up: <button onclick="menu.getKey('up')" type="button"></button> </p>
+          <p class="down">Down: <button onclick="menu.getKey('down')" type="button"></button> </p>
+          <p class="left">Left: <button onclick="menu.getKey('left')" type="button"></button> </p>
+          <p class="right">Right: <button onclick="menu.getKey('right')" type="button"></button> </p>
+          <p class="exit">Exit: <button onclick="menu.getKey('exit')" type="button"></button> </p>
+        </div>
+        <button class="back" type="button" onclick="menu.gotoMain();">Back</button>
+      </div>
     </div>
     <div class="game">
       <div class="info">
