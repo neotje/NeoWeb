@@ -1,7 +1,6 @@
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     topMenu.showTopMenuUser();
-    topMenu.showTopMenuUser();
   } else {
     $.getJSON("./config.json", function(data) {
       if (data.user.required == false) {

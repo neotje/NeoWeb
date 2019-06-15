@@ -6,8 +6,9 @@ $(document).ready(function() {
   game.ctx = game.canvas.getContext("2d");
   game.ctx.imageSmoothingQuality = "high";
 
-  $("#tshoot .menu .main").hide();
   $("#tshoot .menu .setName").hide();
+  $("#tshoot .menu .controls").hide();
+  $("#tshoot .menu .main").hide();
 
   $("#tshoot .menu .setName").submit(function() {
     menu.setName($("#tshoot .menu .setName input").val(), menu.gotoMain);
@@ -17,9 +18,13 @@ $(document).ready(function() {
 firebase.auth().onAuthStateChanged(function(loginUser) {
   if (loginUser) {
     user.doc().collection("tshoot").doc("settings").onSnapshot(function(doc) {
-      user.doc().collection("tshoot").doc("settings").get().then(function(doc) {
-        menu.userData = doc.data();
-      });
+      game.userData = doc.data();
+
+      for (var keyAction in game.userData.keys) {
+        game.keys[keyAction].key = game.userData.keys[keyAction];
+      }
+
+      game.ctx.imageSmoothingQuality = game.userData.graphics;
     });
 
     menu.checkUser();
@@ -32,34 +37,6 @@ window.addEventListener("keydown", function(e) {
     e.preventDefault();
   }
 }, false);
-
-class Gamemanager {
-  constructor(host) {
-    this.type == "manager";
-
-    this.host = host;
-  }
-
-  update(dt) {
-    var playerCount = 0
-
-    for (let entity of game.entities) {
-      // check if entity is a player
-      if (entity.type == "player") {
-        // check the amount of lives of the entity
-        if (entity.lives == 0) {
-          // destroy entity
-          entity.destroy = true;
-
-          // save score if it is your entity
-          if (entity.ID == user.current().uid) {
-            game.score = entity.score;
-          }
-        }
-      }
-    }
-  }
-}
 
 class Player {
   constructor() {
@@ -97,6 +74,14 @@ class Player {
       if (game.keys.right.pressed) {
         this.x += this.speed * dt;
       }
+
+      $("#tshoot .game .info .lives").text(this.lives);
+      $("#tshoot .game .info .score").text(this.score);
+      game.score = this.score;
+    }
+
+    if (this.lives <= 0) {
+      this.destroy = true;
     }
 
     if (this.x < this.radius) {
@@ -110,11 +95,6 @@ class Player {
     }
     if (this.y > game.canvas.height - this.radius) {
       this.y = game.canvas.height - this.radius;
-    }
-
-    if (user.current().uid == this.ID) {
-      $("#tshoot .game .info .lives").text(this.lives);
-      $("#tshoot .game .info .score").text(this.score);
     }
   }
 
@@ -283,9 +263,14 @@ const game = new function() {
   this.canvas;
   this.ctx;
   this.fps;
+
   this.score;
-  this.userName = "";
-  this.action = "";
+  this.playerCount;
+
+  this.mode;
+  this.roomID;
+
+  this.userData = "";
 
   this.entities = [];
 
@@ -338,7 +323,33 @@ const game = new function() {
   this.addEnemy = function(level) {
     var e = new Enemy(level);
 
+    // generate spawn side
+    var spawnSide = randomNumber(1, 4);
+    //console.log("spawn", spawnSide);
+
+    if (spawnSide == 1) {
+      e.x = -50;
+      e.y = randomNumber(0, game.canvas.height);
+    }
+    if (spawnSide == 2) {
+      e.y = -50;
+      e.x = randomNumber(0, game.canvas.width);
+    }
+    if (spawnSide == 3) {
+      e.x = game.canvas.width + 50;
+      e.y = randomNumber(0, game.canvas.height);
+    }
+    if (spawnSide == 4) {
+      e.y = game.canvas.height + 50;
+      e.x = randomNumber(0, game.canvas.width);
+    }
+
     game.entities.push(e);
+  }
+
+  this.uploadUserData = function(callback = function() {}) {
+    user.doc().collection("tshoot").doc("settings").update(game.userData)
+      .then(callback);
   }
 
   function getMousePos(canvas, evt) {
@@ -368,17 +379,45 @@ const game = new function() {
   }
 
   function reset() {
+    for (let action in game.keys) {
+      game.keys[action].pressed = false;
+    }
+
     game.entities = [];
 
     var p = new Player();
 
-    p.name = game.userName;
+    p.name = game.userData.name;
 
     game.entities.push(p);
   }
 
-  this.start = function() {
-    menu.loadConf();
+  function randomNumber(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
+
+  function genRandomNumbers(min, max, sum) {
+    var numbers = [];
+    var loop = true;
+
+    while (loop) {
+      numbers.push(randomNumber(min, max));
+
+      if (total(numbers) > sum) {
+        numbers.pop();
+      }
+      if (total(numbers) == sum) {
+        loop = false;
+      }
+    }
+    return numbers;
+  }
+
+  this.start = function(mode = "singleplayer", roomID = null) {
+    this.mode = mode;
+    this.roomID = roomID;
+
+    //game.loadConf();
 
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);
@@ -398,13 +437,14 @@ const game = new function() {
   this.stop = function() {
     stop = true;
 
-    for (let entity of game.entities) {
-      if (entity.type == "player" && entity.ID == user.current().uid) {
-        game.score = entity.score
-      }
+    if (game.score > game.userData.highscore) {
+      game.userData.score = game.score;
+      game.uploadUserData();
+      menu.gotoGameOver(true);
+    } else {
+      menu.gotoGameOver(false);
     }
 
-    menu.gotoGameOver(game.score, game.userName);
   }
 
   this.loop = function() {
@@ -416,10 +456,19 @@ const game = new function() {
     game.ctx.fillStyle = "black";
     game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 
-    if (game.keys.exit.pressed) {
+    // get player count
+    game.playerCount = 0;
+    for (let entity of game.entities) {
+      if (entity.type == "player") {
+        game.playerCount += 1;
+      }
+    }
+
+    if (game.playerCount == 0 || game.keys.exit.pressed) {
       game.stop();
     }
 
+    // check if a entity needs to be destroyed;
     for (let i in game.entities) {
       if (game.entities[i].destroy == true) {
         console.log("destroyed", game.entities[i]);
@@ -427,9 +476,11 @@ const game = new function() {
       }
     }
 
+    // update every entity;
     for (let entity of game.entities) {
       entity.update(deltaTime);
     }
+    // draw every entity;
     for (let entity of game.entities) {
       entity.draw(game.ctx);
     }
@@ -442,21 +493,6 @@ const game = new function() {
 
 const menu = new function() {
   this.userData;
-
-  this.loadConf = function() {
-    for (var keyAction in menu.userData.keys) {
-      game.keys[keyAction].key = menu.userData.keys[keyAction];
-    }
-
-    game.userName = menu.userData.name;
-
-    game.ctx.imageSmoothingQuality = menu.userData.graphics;
-  }
-
-  this.uploadConf = function(callback = function() {}) {
-    user.doc().collection("tshoot").doc("settings").update(menu.userData)
-      .then(callback);
-  }
 
   this.checkUser = function() {
     var This = this;
@@ -497,15 +533,15 @@ const menu = new function() {
   this.getKey = function(action) {
     menu.action = action;
 
-    for (let action in this.userData.keys) {
-      $("#tshoot .menu .controls .list ." + menu.action + " button").text(this.userData.keys[action]);
+    for (let action in game.userData.keys) {
+      $("#tshoot .menu .controls .list ." + menu.action + " button").text(game.userData.keys[action]);
     }
 
     $("#tshoot .menu .controls .list ." + menu.action + " button").text("...");
 
     function updateKeyConf(e) {
-      menu.userData.keys[menu.action] = e.key;
-      menu.uploadConf();
+      game.userData.keys[menu.action] = e.key;
+      game.uploadUserData();
       $("#tshoot .menu .controls .list ." + menu.action + " button").text(e.key);
       document.removeEventListener("keyup", updateKeyConf);
     }
@@ -513,14 +549,29 @@ const menu = new function() {
     document.addEventListener("keyup", updateKeyConf, false);
   }
 
+  this.submitScore = function() {
+    var db = firebase.firestore();
+
+    var score = {};
+
+    score[user.current().uid] = {
+      name: game.userData.name,
+      score: game.score
+    };
+
+    db.collection("tshoot").doc("Scoreboard").update(score);
+  }
+
   this.gotoMain = function() {
     $("#tshoot .menu .setName").hide();
     $("#tshoot .menu .controls").hide();
+    $("#tshoot .menu .gameOver").hide();
     $("#tshoot .menu .main").show();
   }
   this.gotoSetName = function() {
     $("#tshoot .menu .setName").show();
     $("#tshoot .menu .controls").hide();
+    $("#tshoot .menu .gameOver").hide();
     $("#tshoot .menu .main").hide();
   }
   this.gotoControls = function() {
@@ -530,10 +581,26 @@ const menu = new function() {
 
     $("#tshoot .menu .setName").hide();
     $("#tshoot .menu .controls").show();
+    $("#tshoot .menu .gameOver").hide();
     $("#tshoot .menu .main").hide();
 
-    for (let action in this.userData.keys) {
-      $("#tshoot .menu .controls .list ." + action + " button").text(this.userData.keys[action]);
+    for (let action in game.userData.keys) {
+      $("#tshoot .menu .controls .list ." + action + " button").text(game.userData.keys[action]);
     }
+  }
+  this.gotoGameOver = function(newHighScore) {
+    if (newHighScore) {
+      $("#tshoot .menu .gameOver .score").text("New High Score: " + game.score);
+      menu.submitScore();
+    } else {
+      $("#tshoot .menu .gameOver .score").text("Score: " + game.score);
+    }
+
+    $("#tshoot .menu .setName").hide();
+    $("#tshoot .menu .controls").hide();
+    $("#tshoot .menu .main").hide();
+    $("#tshoot .game").hide();
+    $("#tshoot .menu").show();
+    $("#tshoot .menu .gameOver").show();
   }
 }
