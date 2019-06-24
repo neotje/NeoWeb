@@ -60,6 +60,11 @@ class Player {
     this.radius = 20;
     this.speed = 200;
 
+
+    this.beams = 1;
+    this.damage = 1;
+    this.bulletSpeed = 300
+
     this.color = "white";
 
     this.lives = 3;
@@ -67,6 +72,12 @@ class Player {
 
     this.name = "";
     this.ID = user.current().uid;
+
+    let This = this;
+
+    game.canvas.addEventListener("mousedown", function() {
+      game.shoot(This);
+    }, false);
   }
 
   update(dt) {
@@ -190,7 +201,6 @@ class Bullet {
       this.dy = this.speed * Math.sin(this.angle);
       break;
     }
-
   }
 
   update(dt) {
@@ -201,13 +211,13 @@ class Bullet {
     this.x += this.dx * dt;
     this.y += this.dy * dt;
 
+    // check for collissions
     for (let entity of game.entities) {
       if (this.origin.type == "enemy" && entity.type == "player") {
         var d = game.distance(this.x, this.y, entity.x, entity.y);
         if (d < entity.radius) {
           entity.lives -= this.damage;
-          //this.speed = 130 * Math.pow(0.8, this.level) + 30;
-          game.score -= this.damage;
+          entity.score -= this.damage;
           this.destroy = true;
         }
       }
@@ -216,8 +226,9 @@ class Bullet {
         var d = game.distance(this.x, this.y, entity.x, entity.y);
         if (d < entity.radius) {
           entity.level -= this.damage;
+          entity.lastInteraction = this.origin;
           //this.speed = 130 * Math.pow(0.8, this.level) + 30;
-          game.score += this.damage;
+          this.origin.score += this.damage;
           this.destroy = true;
         }
       }
@@ -250,10 +261,12 @@ class Enemy {
     this.radius = 20;
     this.target;
     this.targets = [];
-    this.distances = []
+    this.distances = [];
+    this.lastInteraction;
   }
 
   update(dt) {
+    // check for collissions
     for (let entity of game.entities) {
       if (entity.type == "player") {
         // calculate distance to player
@@ -264,7 +277,9 @@ class Enemy {
           entity.score += this.level;
           game.addEnemy(this.level);
 
-          this.destroy = true;
+          this.level = 0;
+          this.lastInteraction = entity;
+
         } else {
           this.targets.push({
             distance: d,
@@ -275,8 +290,8 @@ class Enemy {
       }
     }
 
+    // get closest player
     var minDistance = Math.min(...this.distances);
-
     for (let target of this.targets) {
       if (target.distance == minDistance) {
         this.target = target.entity;
@@ -306,7 +321,7 @@ class Enemy {
         game.entities.push(u);
       }
       game.addEnemy(game.level);
-      game.score += this.origLevel;
+      this.lastInteraction.score += this.origLevel;
 
       this.destroy = true;
     }
@@ -346,22 +361,18 @@ class Upgrade {
     this.radius = 20;
   }
 
-  applyUpgrade() {
+  applyUpgrade(entity) {
     if (this.upgrade == "speed") {
-      game.speed += 10;
+      entity.speed += 10;
     }
     if (this.upgrade == "beams") {
-      game.beams += 1;
+      entity.beams += 1;
     }
     if (this.upgrade == "damage") {
       game.damage += 1;
     }
     if (this.upgrade == "life") {
-      for (let entity of game.entities) {
-        if (entity.type == "player" && entity.ID == user.current().uid) {
-          entity.lives += 1;
-        }
-      }
+      entity.lives += 1;
     }
   }
 
@@ -373,7 +384,7 @@ class Upgrade {
     }
     for (let entity of game.entities) {
       if (entity.type == "player" && game.distance(this.x, this.y, entity.x, entity.y) < (this.radius + entity.radius)) {
-        this.applyUpgrade();
+        this.applyUpgrade(entity);
         game.level += 1;
         game.addEnemy(game.level);
         this.destroy = true;
@@ -499,37 +510,6 @@ const game = new function() {
     return Math.sqrt(a * a + b * b);
   }
 
-  this.shoot = function() {
-    //console.log("shooting");
-
-    var startR = 40 / game.beams;
-
-    if (!isEven(game.beams)) {
-      var b = new Bullet(user.current().uid, game.speed, game.damage);
-      game.entities.push(b);
-    }
-
-    for (var i = 1; i <= game.beams / 2; i++) {
-      var b = new Bullet(user.current().uid, game.speed, game.damage);
-
-      b.x += Math.cos(b.player.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
-      b.y += Math.sin(b.player.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
-
-      game.entities.push(b);
-    }
-
-    for (var i = 1; i <= game.beams / 2; i++) {
-      var b = new Bullet(user.current().uid, game.speed, game.damage);
-
-      b.x += Math.cos(b.player.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
-      b.y += Math.sin(b.player.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
-
-      game.entities.push(b);
-    }
-
-    return;
-  }
-
   this.addEnemy = function(level) {
     var e = new Enemy(level);
 
@@ -629,6 +609,36 @@ const game = new function() {
     return numbers;
   }
 
+  this.shoot = function(This) {
+    //console.log("shooting");
+
+    var startR = 40 / This.beams;
+    console.log(This);
+
+    if (!isEven(This.beams)) {
+      var b = new Bullet(This, This.bulletSpeed, This.damage);
+      game.entities.push(b);
+    }
+
+    for (var i = 1; i <= This.beams / 2; i++) {
+      var b = new Bullet(This, This.bulletSpeed, This.damage);
+
+      b.x += Math.cos(This.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      b.y += Math.sin(This.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      game.entities.push(b);
+    }
+
+    for (var i = 1; i <= This.beams / 2; i++) {
+      var b = new Bullet(This, This.bulletSpeed, This.damage);
+
+      b.x += Math.cos(This.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      b.y += Math.sin(This.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      game.entities.push(b);
+    }
+  }
+
   this.start = function(mode = "singleplayer", roomID = null) {
     this.mode = mode;
     this.roomID = roomID;
@@ -638,7 +648,6 @@ const game = new function() {
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);
     game.canvas.addEventListener("mousemove", game.mouse.update, false);
-    game.canvas.addEventListener("mousedown", game.shoot, false);
 
     reset();
 
