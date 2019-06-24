@@ -1,0 +1,54 @@
+[debug] [2019-06-20T06:48:35.188Z] ----------------------------------------------------------------------
+[debug] [2019-06-20T06:48:35.191Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\neotj\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2019-06-20T06:48:35.191Z] CLI Version:   7.0.0
+[debug] [2019-06-20T06:48:35.191Z] Platform:      win32
+[debug] [2019-06-20T06:48:35.191Z] Node Version:  v10.16.0
+[debug] [2019-06-20T06:48:35.193Z] Time:          Thu Jun 20 2019 08:48:35 GMT+0200 (Central European Summer Time)
+[debug] [2019-06-20T06:48:35.193Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-06-20T06:48:35.206Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-06-20T06:48:35.207Z] > authorizing via signed-in user
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\neotj\Documents\GitHub\neohub\nodejs
+
+[debug] [2019-06-20T06:49:17.977Z] Error: kill ENOSYS
+    at process.kill (internal/process/per_thread.js:198:13)
+    at process.listener (C:\Users\neotj\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\signal-exit\index.js:95:15)
+    at process.emit (events.js:198:13)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2019-06-20T06:49:45.345Z] ----------------------------------------------------------------------
+[debug] [2019-06-20T06:49:45.348Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\neotj\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2019-06-20T06:49:45.348Z] CLI Version:   7.0.0
+[debug] [2019-06-20T06:49:45.348Z] Platform:      win32
+[debug] [2019-06-20T06:49:45.348Z] Node Version:  v10.16.0
+[debug] [2019-06-20T06:49:45.350Z] Time:          Thu Jun 20 2019 08:49:45 GMT+0200 (Central European Summer Time)
+[debug] [2019-06-20T06:49:45.350Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-06-20T06:49:45.362Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-06-20T06:49:45.363Z] > authorizing via signed-in user
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\neotj\Documents\GitHub\neohub\nodejs
+
+[debug] [2019-06-20T06:50:03.625Z] Error: kill ENOSYS
+    at process.kill (internal/process/per_thread.js:198:13)
+    at process.listener (C:\Users\neotj\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\signal-exit\index.js:95:15)
+    at process.emit (events.js:198:13)
+[error] 
+[error] Error: An unexpected error has occurred.

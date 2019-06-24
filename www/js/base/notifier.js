@@ -43,13 +43,9 @@ class notification {
     let This = this;
 
     $("#notify")[0].insertAdjacentHTML("beforeend", "<div id='" + this.id + "' style='color: " + this.color + "'><h6>" + this.title + "</h4><p>" + this.message + "</p></div>");
-    $("#" + this.id).click(function() {
-      This.remove();
-    });
+    $("#" + this.id).click(this.remove);
 
-    setTimeout(function() {
-      This.remove();
-    }, this.duration);
+    setTimeout(this.remove, this.duration);
   }
 
   remove() {
@@ -61,11 +57,11 @@ class notification {
       opacity: 0,
       easing: "cubicBezier(.25, .8, .25, 1)",
       complete: function() {
-        for (var i = 0; i < notify.activeNotifications.length; i++) {
-          var notification = notify.activeNotifications[i];
+        for (var i = 0; i < notifier.activeNotifications.length; i++) {
+          var notification = notifier.activeNotifications[i];
 
           if (notification.id == This.id) {
-            notify.activeNotifications.splice(i, 1);
+            notifier.activeNotifications.splice(i, 1);
           }
         }
 

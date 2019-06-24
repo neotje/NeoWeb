@@ -43,6 +43,8 @@ const user = new function() {
 
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
       notifier.show("Login Failed", "Please try again.", 10000, "red");
+    }).then(function() {
+      notifier.show("Login Succesfull", "", 10000, "green");
     });
   }
 
@@ -91,6 +93,7 @@ firebase.auth().onAuthStateChanged(function(loginUser) {
     $.getJSON("./config.json", function(data) {
       if (data.user.required) {
         user.showAuthForm();
+        notifier.show("Authentication required", "This page requires you to login or register.", 10000);
       }
     });
   }

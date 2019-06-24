@@ -68,7 +68,7 @@
         <h3>Tshoot</h3>
         <div class="list">
           <button type="button" onclick="game.start();">Singleplayer</button>
-          <button type="button" onclick="">Scoreboard</button>
+          <button type="button" onclick="menu.gotoScoreBoard()">Scoreboard</button>
           <button type="button" onclick="menu.gotoControls();">Controls</button>
           <button type="button">Settings</button>
         </div>
@@ -89,6 +89,19 @@
           <p class="exit">Exit: <button onclick="menu.getKey('exit')" type="button"></button> </p>
         </div>
         <button class="back" type="button" onclick="menu.gotoMain();">Back</button>
+      </div>
+
+      <div class="scoreboard">
+        <h3>ScoreBoard</h3>
+        <table>
+          <tr>
+            <th>#</th>
+            <th>name</th>
+            <th>score</th>
+          </tr>
+        </table>
+        <button class="back" type="button" onclick="menu.gotoMain();">Back</button>
+
       </div>
 
       <div class="gameOver">

@@ -38,6 +38,17 @@ window.addEventListener("keydown", function(e) {
   }
 }, false);
 
+function isEven(value) {
+  if (value % 2 == 0)
+    return true;
+  else
+    return false;
+}
+
+function randomNumber(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+
 class Player {
   constructor() {
     this.type = "player";
@@ -108,13 +119,44 @@ class Player {
     ctx.closePath();
 
     // gun
-    ctx.beginPath();
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = 4;
-    ctx.moveTo(this.x + (Math.cos(this.angle) * 10), this.y + (Math.sin(this.angle) * 10));
-    ctx.lineTo(this.x + (Math.cos(this.angle) * 30), this.y + (Math.sin(this.angle) * 30));
-    ctx.stroke();
-    ctx.closePath();
+    var startR = 40 / game.beams;
+
+    if (!isEven(game.beams)) {
+      ctx.beginPath();
+      ctx.strokeStyle = this.color;
+      //ctx.lineWidth = 4;
+      ctx.moveTo(this.x + (Math.cos(this.angle) * 10), this.y + (Math.sin(this.angle) * 10));
+      ctx.lineTo(this.x + (Math.cos(this.angle) * 30), this.y + (Math.sin(this.angle) * 30));
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+    for (var i = 1; i <= game.beams / 2; i++) {
+      var rX = Math.cos(this.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      var rY = Math.sin(this.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      ctx.beginPath();
+      ctx.strokeStyle = this.color;
+      //ctx.lineWidth = 4;
+      ctx.moveTo(this.x + (Math.cos(this.angle) * 10) + rX, this.y + (Math.sin(this.angle) * 10) + rY);
+      ctx.lineTo(this.x + (Math.cos(this.angle) * 30) + rX, this.y + (Math.sin(this.angle) * 30) + rY);
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+    for (var i = 1; i <= game.beams / 2; i++) {
+      var rX = Math.cos(this.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      var rY = Math.sin(this.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      ctx.beginPath();
+      ctx.strokeStyle = this.color;
+      //ctx.lineWidth = 4;
+      ctx.moveTo(this.x + (Math.cos(this.angle) * 10) + rX, this.y + (Math.sin(this.angle) * 10) + rY);
+      ctx.lineTo(this.x + (Math.cos(this.angle) * 30) + rX, this.y + (Math.sin(this.angle) * 30) + rY);
+      ctx.stroke();
+      ctx.closePath();
+    }
+
 
     // Name
     ctx.beginPath();
@@ -127,9 +169,9 @@ class Player {
 }
 
 class Bullet {
-  constructor(uid) {
+  constructor(origin, speed, damage) {
     this.type = "bullet";
-    this.player;
+    this.origin = origin;
     this.destroy = false;
 
     this.x;
@@ -137,19 +179,18 @@ class Bullet {
     this.angle;
     this.dx;
     this.dy;
-    this.speed = 400;
+    this.speed = speed;
+    this.damage = damage;
 
-    for (let entity of game.entities) {
-      if (entity.type == "player" && entity.ID == uid) {
-        this.player = entity;
-        this.x = this.player.x + (Math.cos(this.player.angle) * 20);
-        this.y = this.player.y + (Math.sin(this.player.angle) * 20);
-        this.angle = this.player.angle;
-        this.dx = this.speed * Math.cos(this.angle);
-        this.dy = this.speed * Math.sin(this.angle);
-        break;
-      }
+    if (this.origin.type == "player") {
+      this.x = this.origin.x + (Math.cos(this.origin.angle) * 20);
+      this.y = this.origin.y + (Math.sin(this.origin.angle) * 20);
+      this.angle = this.origin.angle;
+      this.dx = this.speed * Math.cos(this.angle);
+      this.dy = this.speed * Math.sin(this.angle);
+      break;
     }
+
   }
 
   update(dt) {
@@ -159,6 +200,28 @@ class Bullet {
 
     this.x += this.dx * dt;
     this.y += this.dy * dt;
+
+    for (let entity of game.entities) {
+      if (this.origin.type == "enemy" && entity.type == "player") {
+        var d = game.distance(this.x, this.y, entity.x, entity.y);
+        if (d < entity.radius) {
+          entity.lives -= this.damage;
+          //this.speed = 130 * Math.pow(0.8, this.level) + 30;
+          game.score -= this.damage;
+          this.destroy = true;
+        }
+      }
+
+      if (this.origin.type == "player" && entity.type == "enemy") {
+        var d = game.distance(this.x, this.y, entity.x, entity.y);
+        if (d < entity.radius) {
+          entity.level -= this.damage;
+          //this.speed = 130 * Math.pow(0.8, this.level) + 30;
+          game.score += this.damage;
+          this.destroy = true;
+        }
+      }
+    }
   }
 
   draw(ctx) {
@@ -175,14 +238,15 @@ class Bullet {
 class Enemy {
   constructor(level) {
     this.type = "enemy";
-    this.destroy = "false";
+    this.destroy = false;
 
     this.level = level;
+    this.origLevel = level;
 
     this.x = 0;
     this.y = 0;
     this.angle = 0;
-    this.speed = 95 * Math.pow(0.8, this.level) + 30;
+    this.speed = 175;
     this.radius = 20;
     this.target;
     this.targets = [];
@@ -198,6 +262,8 @@ class Enemy {
         if (d < this.radius + entity.radius) {
           entity.lives -= 1;
           entity.score += this.level;
+          game.addEnemy(this.level);
+
           this.destroy = true;
         } else {
           this.targets.push({
@@ -205,14 +271,6 @@ class Enemy {
             entity: entity
           });
           this.distances.push(d);
-        }
-      }
-      if (entity.type == "bullet") {
-        var d = game.distance(this.x, this.y, entity.x, entity.y);
-        if (d < this.radius) {
-          this.level -= 1;
-          entity.player.score += 1;
-          entity.destroy = true;
         }
       }
     }
@@ -227,6 +285,29 @@ class Enemy {
     }
 
     if (this.level <= 0) {
+      var random = randomNumber(0, 100);
+
+      //console.log(random);
+
+      if (random >= 0 && random <= 15) {
+        var u = new Upgrade("speed", this.x, this.y);
+        game.entities.push(u);
+      }
+      if (random > 15 && random <= 20 && game.beams < 10) {
+        var u = new Upgrade("beams", this.x, this.y);
+        game.entities.push(u);
+      }
+      if (random > 20 && random <= 25) {
+        var u = new Upgrade("damage", this.x, this.y);
+        game.entities.push(u);
+      }
+      if (random > 25 && random <= 30) {
+        var u = new Upgrade("life", this.x, this.y);
+        game.entities.push(u);
+      }
+      game.addEnemy(game.level);
+      game.score += this.origLevel;
+
       this.destroy = true;
     }
 
@@ -253,6 +334,105 @@ class Enemy {
   }
 }
 
+class Upgrade {
+  constructor(upgrade, x, y) {
+    this.type = "upgrade";
+    this.upgrade = upgrade;
+    this.x = x;
+    this.y = y;
+
+    this.time = 0;
+
+    this.radius = 20;
+  }
+
+  applyUpgrade() {
+    if (this.upgrade == "speed") {
+      game.speed += 10;
+    }
+    if (this.upgrade == "beams") {
+      game.beams += 1;
+    }
+    if (this.upgrade == "damage") {
+      game.damage += 1;
+    }
+    if (this.upgrade == "life") {
+      for (let entity of game.entities) {
+        if (entity.type == "player" && entity.ID == user.current().uid) {
+          entity.lives += 1;
+        }
+      }
+    }
+  }
+
+  update(dt) {
+    this.time += dt;
+
+    if (this.time > 3) {
+      this.destroy = true;
+    }
+    for (let entity of game.entities) {
+      if (entity.type == "player" && game.distance(this.x, this.y, entity.x, entity.y) < (this.radius + entity.radius)) {
+        this.applyUpgrade();
+        game.level += 1;
+        game.addEnemy(game.level);
+        this.destroy = true;
+      }
+    }
+  }
+
+  draw(ctx) {
+    if (this.upgrade == "speed") {
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.moveTo(this.x, this.y - 5);
+      ctx.lineTo(this.x + 10, this.y + 5);
+      ctx.moveTo(this.x, this.y - 5);
+      ctx.lineTo(this.x - 10, this.y + 5);
+      ctx.strokeStyle = "yellow";
+      ctx.stroke();
+      ctx.closePath();
+    }
+    if (this.upgrade == "beams") {
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.moveTo(this.x, this.y - 10);
+      ctx.lineTo(this.x, this.y + 10);
+      ctx.moveTo(this.x + 5, this.y - 10);
+      ctx.lineTo(this.x + 5, this.y + 10);
+      ctx.moveTo(this.x - 5, this.y - 10);
+      ctx.lineTo(this.x - 5, this.y + 10);
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+      ctx.closePath();
+    }
+    if (this.upgrade == "damage") {
+      ctx.beginPath();
+      ctx.lineWidth = 4;
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.moveTo(this.x, this.y - 10);
+      ctx.lineTo(this.x, this.y + 10);
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+      ctx.closePath();
+    }
+    if (this.upgrade == "life") {
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.moveTo(this.x, this.y - 10);
+      ctx.lineTo(this.x, this.y + 10);
+      ctx.moveTo(this.x - 10, this.y);
+      ctx.lineTo(this.x + 10, this.y);
+      ctx.strokeStyle = "green";
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+}
+
 const game = new function() {
   var lastTime;
   var currentTime;
@@ -266,6 +446,11 @@ const game = new function() {
 
   this.score;
   this.playerCount;
+  this.level = 1;
+
+  this.damage = 1;
+  this.beams = 1;
+  this.speed = 400;
 
   this.mode;
   this.roomID;
@@ -315,9 +500,34 @@ const game = new function() {
   }
 
   this.shoot = function() {
-    var b = new Bullet(user.current().uid);
+    //console.log("shooting");
 
-    game.entities.push(b);
+    var startR = 40 / game.beams;
+
+    if (!isEven(game.beams)) {
+      var b = new Bullet(user.current().uid, game.speed, game.damage);
+      game.entities.push(b);
+    }
+
+    for (var i = 1; i <= game.beams / 2; i++) {
+      var b = new Bullet(user.current().uid, game.speed, game.damage);
+
+      b.x += Math.cos(b.player.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      b.y += Math.sin(b.player.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      game.entities.push(b);
+    }
+
+    for (var i = 1; i <= game.beams / 2; i++) {
+      var b = new Bullet(user.current().uid, game.speed, game.damage);
+
+      b.x += Math.cos(b.player.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+      b.y += Math.sin(b.player.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
+
+      game.entities.push(b);
+    }
+
+    return;
   }
 
   this.addEnemy = function(level) {
@@ -364,7 +574,7 @@ const game = new function() {
     for (let key in game.keys) {
       if (game.keys[key].key == e.key) {
         game.keys[key].pressed = true;
-        console.log(game.keys[key]);
+        //console.log(game.keys[key]);
       }
     }
   }
@@ -373,12 +583,18 @@ const game = new function() {
     for (let key in game.keys) {
       if (game.keys[key].key == e.key) {
         game.keys[key].pressed = false;
-        console.log(game.keys[key]);
+        //console.log(game.keys[key]);
       }
     }
   }
 
   function reset() {
+    game.level = 1;
+
+    game.damage = 1;
+    game.beams = 1;
+    game.speed = 400;
+
     for (let action in game.keys) {
       game.keys[action].pressed = false;
     }
@@ -386,10 +602,10 @@ const game = new function() {
     game.entities = [];
 
     var p = new Player();
-
     p.name = game.userData.name;
-
     game.entities.push(p);
+
+    game.addEnemy(game.level);
   }
 
   function randomNumber(min, max) {
@@ -437,8 +653,13 @@ const game = new function() {
   this.stop = function() {
     stop = true;
 
+    document.removeEventListener("keydown", keyDownHandler);
+    document.removeEventListener("keyup", keyUpHandler);
+    game.canvas.removeEventListener("mousemove", game.mouse.update);
+    game.canvas.removeEventListener("mousedown", game.shoot);
+
     if (game.score > game.userData.highscore) {
-      game.userData.score = game.score;
+      game.userData.highscore = game.score;
       game.uploadUserData();
       menu.gotoGameOver(true);
     } else {
@@ -448,6 +669,9 @@ const game = new function() {
   }
 
   this.loop = function() {
+    if (stop) {
+      return;
+    }
     currentTime = performance.now();
     deltaTime = (currentTime - lastTime) / 1000;
     lastTime = currentTime;
@@ -471,7 +695,7 @@ const game = new function() {
     // check if a entity needs to be destroyed;
     for (let i in game.entities) {
       if (game.entities[i].destroy == true) {
-        console.log("destroyed", game.entities[i]);
+        //console.log("destroyed", game.entities[i]);
         game.entities.splice(i, 1);
       }
     }
@@ -485,9 +709,7 @@ const game = new function() {
       entity.draw(game.ctx);
     }
 
-    if (stop == false) {
-      window.requestAnimationFrame(game.loop);
-    }
+    window.requestAnimationFrame(game.loop);
   }
 }
 
@@ -554,7 +776,7 @@ const menu = new function() {
 
     var score = {};
 
-    score[user.current().uid] = {
+    score[user.current().uid.substring(0, 4)] = {
       name: game.userData.name,
       score: game.score
     };
@@ -567,26 +789,57 @@ const menu = new function() {
     $("#tshoot .menu .controls").hide();
     $("#tshoot .menu .gameOver").hide();
     $("#tshoot .menu .main").show();
+    $("#tshoot .menu .scoreboard").hide();
   }
   this.gotoSetName = function() {
     $("#tshoot .menu .setName").show();
     $("#tshoot .menu .controls").hide();
     $("#tshoot .menu .gameOver").hide();
     $("#tshoot .menu .main").hide();
+    $("#tshoot .menu .scoreboard").hide();
   }
   this.gotoControls = function() {
     try {
       document.removeEventListener("keyup", updateKeyConf);
     } catch (e) {}
+  }
+  this.gotoScoreBoard = function() {
+    var db = firebase.firestore();
+    db.collection("tshoot").doc("Scoreboard").get().then(function(doc) {
+      var scoresObj = doc.data();
+      var scoresArr = [];
 
-    $("#tshoot .menu .setName").hide();
-    $("#tshoot .menu .controls").show();
-    $("#tshoot .menu .gameOver").hide();
-    $("#tshoot .menu .main").hide();
+      //console.log(scoresObj);
 
-    for (let action in game.userData.keys) {
-      $("#tshoot .menu .controls .list ." + action + " button").text(game.userData.keys[action]);
-    }
+      for (let player in scoresObj) {
+        scoresObj[player].id = player;
+        scoresArr.push(scoresObj[player]);
+      }
+
+      scoresArr = scoresArr.sort(function(a, b) {
+        return b.score - a.score
+      });
+
+      //console.log(scoresArr);
+
+      $("#tshoot .menu .scoreboard table").html("<tr><th>#</th><th>name</th><th>score</th></tr>");
+
+      for (var i = 1; i <= scoresArr.length; i++) {
+        var score = scoresArr[i - 1];
+
+        if (score.id == user.current().uid.substring(0, 4)) {
+          $("#tshoot .menu .scoreboard table").append("<tr style='background-color: #4CAF50'><td>" + i + "</td><td>" + score.name + "</td><td>" + score.score + "</td></tr>");
+          continue;
+        }
+        $("#tshoot .menu .scoreboard table").append("<tr><td>" + i + "</td><td>" + score.name + "</td><td>" + score.score + "</td></tr>");
+      }
+
+      $("#tshoot .menu .setName").hide();
+      $("#tshoot .menu .controls").hide();
+      $("#tshoot .menu .gameOver").hide();
+      $("#tshoot .menu .main").hide();
+      $("#tshoot .menu .scoreboard").show();
+    });
   }
   this.gotoGameOver = function(newHighScore) {
     if (newHighScore) {
@@ -599,6 +852,7 @@ const menu = new function() {
     $("#tshoot .menu .setName").hide();
     $("#tshoot .menu .controls").hide();
     $("#tshoot .menu .main").hide();
+    $("#tshoot .menu .scoreboard").hide();
     $("#tshoot .game").hide();
     $("#tshoot .menu").show();
     $("#tshoot .menu .gameOver").show();
