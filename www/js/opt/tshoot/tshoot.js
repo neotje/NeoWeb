@@ -4,11 +4,12 @@ $(document).ready(function() {
 
   game.canvas = document.getElementById("tshootCanvas");
   game.ctx = game.canvas.getContext("2d");
-  game.ctx.imageSmoothingQuality = "high";
+  game.ctx.imageSmoothingQuality = "low";
 
   $("#tshoot .menu .setName").hide();
   $("#tshoot .menu .controls").hide();
   $("#tshoot .menu .main").hide();
+  $("#tshoot .menu .scoreboard").hide();
 
   $("#tshoot .menu .setName").submit(function() {
     menu.setName($("#tshoot .menu .setName input").val(), menu.gotoMain);
@@ -130,9 +131,9 @@ class Player {
     ctx.closePath();
 
     // gun
-    var startR = 40 / game.beams;
+    var startR = 40 / this.beams;
 
-    if (!isEven(game.beams)) {
+    if (!isEven(this.beams)) {
       ctx.beginPath();
       ctx.strokeStyle = this.color;
       //ctx.lineWidth = 4;
@@ -142,7 +143,7 @@ class Player {
       ctx.closePath();
     }
 
-    for (var i = 1; i <= game.beams / 2; i++) {
+    for (var i = 1; i <= this.beams / 2; i++) {
       var rX = Math.cos(this.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
       var rY = Math.sin(this.angle + (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
 
@@ -155,7 +156,7 @@ class Player {
       ctx.closePath();
     }
 
-    for (var i = 1; i <= game.beams / 2; i++) {
+    for (var i = 1; i <= this.beams / 2; i++) {
       var rX = Math.cos(this.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
       var rY = Math.sin(this.angle - (0.5 * Math.PI)) * (i * startR - (0.5 * startR));
 
@@ -199,7 +200,6 @@ class Bullet {
       this.angle = this.origin.angle;
       this.dx = this.speed * Math.cos(this.angle);
       this.dy = this.speed * Math.sin(this.angle);
-      break;
     }
   }
 
@@ -227,7 +227,6 @@ class Bullet {
         if (d < entity.radius) {
           entity.level -= this.damage;
           entity.lastInteraction = this.origin;
-          //this.speed = 130 * Math.pow(0.8, this.level) + 30;
           this.origin.score += this.damage;
           this.destroy = true;
         }
@@ -275,10 +274,11 @@ class Enemy {
         if (d < this.radius + entity.radius) {
           entity.lives -= 1;
           entity.score += this.level;
-          game.addEnemy(this.level);
 
           this.level = 0;
           this.lastInteraction = entity;
+          this.lastInteraction.score += this.origLevel;
+
 
         } else {
           this.targets.push({
@@ -321,7 +321,6 @@ class Enemy {
         game.entities.push(u);
       }
       game.addEnemy(game.level);
-      this.lastInteraction.score += this.origLevel;
 
       this.destroy = true;
     }
@@ -363,13 +362,13 @@ class Upgrade {
 
   applyUpgrade(entity) {
     if (this.upgrade == "speed") {
-      entity.speed += 10;
+      entity.bulletSpeed += 10;
     }
     if (this.upgrade == "beams") {
       entity.beams += 1;
     }
     if (this.upgrade == "damage") {
-      game.damage += 1;
+      entity.damage += 1;
     }
     if (this.upgrade == "life") {
       entity.lives += 1;
@@ -571,15 +570,13 @@ const game = new function() {
   function reset() {
     game.level = 1;
 
-    game.damage = 1;
-    game.beams = 1;
-    game.speed = 400;
-
     for (let action in game.keys) {
       game.keys[action].pressed = false;
     }
 
     game.entities = [];
+
+    game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 
     var p = new Player();
     p.name = game.userData.name;
@@ -674,7 +671,6 @@ const game = new function() {
     } else {
       menu.gotoGameOver(false);
     }
-
   }
 
   this.loop = function() {
