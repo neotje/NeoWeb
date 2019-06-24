@@ -24,6 +24,9 @@ const topMenu = new function() {
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     topMenu.showTopMenuUser();
+    if (user.photoURL) {
+      $("#topMenu .user img").attr("src", user.photoURL);
+    }
   } else {
     $.getJSON("./config.json", function(data) {
       if (data.user.required == false) {

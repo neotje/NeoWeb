@@ -1,5 +1,7 @@
 const user = new function() {
   var db = firebase.firestore();
+  var provider = new firebase.auth.GoogleAuthProvider();
+
   let This = this;
   this.current = function() {
     return firebase.auth().currentUser;
@@ -45,6 +47,18 @@ const user = new function() {
       notifier.show("Login Failed", "Please try again.", 10000, "red");
     }).then(function() {
       notifier.show("Login Succesfull", "", 10000, "green");
+    });
+  }
+
+  this.google = function() {
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+      notifier.show("Login Succesfull", "", 6000, "green");
+      user.hideAuthForm();
+    }).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      notifier.show("Login Failed", errorMessage, 10000, "red");
     });
   }
 
