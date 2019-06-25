@@ -48,12 +48,23 @@
   width: 100%;
 }
 
+@media only screen and (min-width: 1300px) {
+  #home .container .featured .items {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  #home .container .featured .items {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
 #home .container .featured .items {
   display: grid;
 
   margin-top: 3rem;
 
-  grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 1rem;
 }
 
