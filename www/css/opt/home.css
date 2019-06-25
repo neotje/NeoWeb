@@ -60,6 +60,18 @@
   }
 }
 
+@media only screen and (max-width: 900px) {
+  #home .container .featured .items {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  #home .container .featured .items {
+    grid-template-columns: 1fr;
+  }
+}
+
 #home .container .featured .items {
   display: grid;
 
