@@ -16,27 +16,27 @@ const user = new function() {
       $("#user .container .topMenu .login").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .register").css("border-bottom-color", "white");
 
-      $("#user .container .forms .register").hide(300, function() {
-        $("#user .container .forms .login").show(300);
+      $("#user .container .forms .register").fadeOut(75, function() {
+        $("#user .container .forms .login").fadeIn(150);
       });
     }
     if (form == "register") {
       $("#user .container .topMenu .register").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .login").css("border-bottom-color", "white");
 
-      $("#user .container .forms .login").hide(300, function() {
-        $("#user .container .forms .register").show(300);
+      $("#user .container .forms .login").fadeOut(75, function() {
+        $("#user .container .forms .register").fadeIn(150);
       });
     }
   }
 
   this.showAuthForm = function(callback = function() {}) {
     This.formSwitchTo("login");
-    $("#user").show(300, callback);
+    $("#user").fadeIn(150, callback);
   }
 
   this.hideAuthForm = function(callback = function() {}) {
-    $("#user").hide(300, callback);
+    $("#user").fadeOut(75, callback);
   }
 
   this.login = function() {
