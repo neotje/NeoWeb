@@ -2,6 +2,10 @@ const user = new function() {
   var db = firebase.firestore();
   var provider = new firebase.auth.GoogleAuthProvider();
 
+  function checkURL(url) {
+    return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+  }
+
   let This = this;
   this.current = function() {
     return firebase.auth().currentUser;
@@ -44,10 +48,64 @@ const user = new function() {
     var password = $("#user .container .forms .login .password").val();
 
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      notifier.show("Login Failed", "Please try again.", 10000, "red");
+      notifier.show("Login Failed", "Please try again. <a style='color: blue; text-decoration: underline;' onclick='user.forgotPassword()'>Forgot password</a>", 10000, "red");
+      console.error(error);
     }).then(function() {
-      notifier.show("Login Succesfull", "", 10000, "green");
+      if (firebase.auth().currentUser) {
+        notifier.show("Login Succesfull", "", 10000, "green");
+      }
     });
+  }
+
+  this.forgotPassword = function() {
+    var email = $("#user .container .forms .login .email").val();
+
+    firebase.auth().sendPasswordResetEmail(email)
+      .then(function() {
+        notifier.show("Check your Mailbox", "Password reset mail has been send to: " + email, 10000, "green");
+      })
+      .catch(function(error) {
+        console.error(error);
+        notifier.show("Reset password request error", "Check if you filled in the correct email or this email doesn't have a account registered.", 10000, "red");
+      });
+  }
+
+  this.newPassword = function() {
+    var password = $("#settings .passwordForm .newPassword").val()
+    this.current().updatePassword(password).then(function() {
+      notifier.show("Password changed", "", 10000, "green");
+    }).catch(function(error) {
+      console.error(error);
+
+      if (error.code == "auth/weak-password") {
+        notifier.show("Password change error", "password is too weak.", 10000, "red");
+      }
+      if (error.code == "auth/requires-recent-login") {
+        notifier.show("Password change error", "Please logout and then login. for security reasons.", 10000, "red");
+      }
+    });
+  }
+
+  this.updateProfile = function() {
+    var name = $("#settings .profileForm .displayName").val();
+    var photo = $("#settings .profileForm .photoURL").val();
+
+    if (checkURL(photo)) {
+      this.current().updateProfile({
+        displayName: name,
+        photoURL: photo
+      }).then(function() {
+        notifier.show("Profile update Succesfull!", "", 10000, "green");
+
+        topMenu.showTopMenuUser();
+      }, function(error) {
+        notifier.show("Something went wrong", "", 10000, "red");
+
+      });
+    } else {
+      notifier.show("Photo URL error", "Check if you have a valid URL to a photo. suported formats: jpeg, jpg, gif or png", 10000, "red");
+
+    }
   }
 
   this.google = function() {
@@ -55,6 +113,8 @@ const user = new function() {
       notifier.show("Login Succesfull", "", 6000, "green");
       user.hideAuthForm();
     }).catch(function(error) {
+      console.error(error);
+
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
@@ -72,6 +132,7 @@ const user = new function() {
         }
       });
     }).catch(function(error) {
+      console.error(error);
 
     });
   }
@@ -83,6 +144,8 @@ const user = new function() {
 
     if (password == rPassword) {
       firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+        console.error(error);
+
         notifier.show("Registration Failed", "Please try again.", 10000, "red");
       });
     } else {
@@ -95,6 +158,13 @@ firebase.auth().onAuthStateChanged(function(loginUser) {
   if (loginUser) {
     user.currrent = loginUser;
     user.hideAuthForm();
+
+    Sentry.configureScope((scope) => {
+      scope.setUser({
+        "email": user.current().email,
+        "id": user.current().uid
+      });
+    });
 
     if (loginUser.emailVerified == false) {
       notifier.show("Email verification", "Please check your inbox!", 10000, "red");

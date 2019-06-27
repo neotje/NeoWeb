@@ -14,6 +14,13 @@ const topMenu = new function() {
   }
 
   this.showTopMenuUser = function() {
+    if (user.current().photoURL == null || user.current().photoURL == "") {} else {
+      $("#topMenu .user img").attr("src", user.current().photoURL);
+
+    }
+
+    $("#topMenu .user .name").text(user.current().displayName);
+
     $("#topMenu .authCloseBtn").hide(300);
     $("#topMenu .authBtn").hide(300, function() {
       $("#topMenu .user").show(300);
@@ -24,9 +31,6 @@ const topMenu = new function() {
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     topMenu.showTopMenuUser();
-    if (user.photoURL) {
-      $("#topMenu .user img").attr("src", user.photoURL);
-    }
   } else {
     $.getJSON("./config.json", function(data) {
       if (data.user.required == false) {

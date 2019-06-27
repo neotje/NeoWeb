@@ -11,6 +11,13 @@
   <!-- STYLESHEETS -->
 
   <!-- SCRIPTS -->
+  <script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous">
+  </script>
+  <script type="text/javascript">
+    Sentry.init({
+      dsn: 'https://b5b2e6ff763b45e1b85e7691a4084a2d@sentry.io/1491138'
+    });
+  </script>
   <!-- lib -->
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
@@ -64,14 +71,28 @@
 
   <div id="settings">
     <h2>Account Settings</h2>
-    <form class="passwordForm">
+    <form class="passwordForm" onsubmit="user.newPassword()">
       <h6>Change Password</h6>
-      <input type="password" name="currentPassword" placeholder="Enter current password" autocomplete="current-password" required>
-      <input type="password" name="currentPassword" placeholder="Enter new password" autocomplete="new-password" required>
-      <input type="password" name="currentPassword" placeholder="Repeat new password" autocomplete="new-password" required>
+      <input class="newPassword" type="password" placeholder="new password" autocomplete="new-password" required>
+      <button class="material-icons" type="submit">check</button>
+    </form>
+    <form class="profileForm" onsubmit="user.updateProfile()">
+      <h6>Change profile</h6>
+      username: <input class="displayName" type="text" placeholder="username" autocomplete="username"><br>
+      profile photo url: <input class="photoURL" type="url" placeholder="profile picture" autocomplete="photo">
+
       <button class="material-icons" type="submit">check</button>
     </form>
   </div>
+
+  <script type="text/javascript">
+    firebase.auth().onAuthStateChanged(function(loginUser) {
+      if (loginUser) {
+        $("#settings .profileForm .displayName").val(user.current().displayName);
+        $("#settings .profileForm .photoURL").val(user.current().photoURL);
+      } else {}
+    });
+  </script>
 
   <div id="footer">
   </div>

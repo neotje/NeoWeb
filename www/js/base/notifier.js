@@ -45,13 +45,15 @@ class notification {
     $("#notify")[0].insertAdjacentHTML("beforeend", "<div id='" + this.id + "' style='color: " + this.color + "'><h6>" + this.title + "</h4><p>" + this.message + "</p></div>");
     $("#" + this.id).click(this.remove);
 
-    setTimeout(this.remove, this.duration);
+    setTimeout(function() {
+      This.remove(This);
+    }, this.duration);
   }
 
-  remove() {
-    let This = this
+  remove(This) {
+    console.log("removing", this.id);
     anime({
-      targets: "#" + this.id,
+      targets: "#" + This.id,
       duration: 400,
       scale: 0,
       opacity: 0,

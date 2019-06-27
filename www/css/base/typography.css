@@ -91,6 +91,10 @@ button {
   -webkit-font-smoothing: antialiased;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 .subtext {
   margin-top: .25rem;
   margin-bottom: .25rem;

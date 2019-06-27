@@ -14,6 +14,10 @@ $(document).ready(function() {
   $("#tshoot .menu .setName").submit(function() {
     menu.setName($("#tshoot .menu .setName input").val(), menu.gotoMain);
   });
+
+  if ($(window).height < 720 || $(window).width() < 1280) {
+    notifier.show("Compatibility issue", "Your screen is too small to display this game properly.", 10000, "red");
+  }
 });
 
 firebase.auth().onAuthStateChanged(function(loginUser) {
@@ -579,7 +583,7 @@ const game = new function() {
     game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 
     var p = new Player();
-    p.name = game.userData.name;
+    p.name = user.current().displayName;
     game.entities.push(p);
 
     game.addEnemy(game.level);
@@ -637,6 +641,11 @@ const game = new function() {
   }
 
   this.start = function(mode = "singleplayer", roomID = null) {
+    if ($(window).height < 720 || $(window).width() < 1280) {
+      notifier.show("Compatibility issue", "Your screen is too small to display this game properly. You can try to adjust the page zoom.", 10000, "red");
+      return;
+    }
+
     this.mode = mode;
     this.roomID = roomID;
 
@@ -743,7 +752,7 @@ const menu = new function() {
         return;
       }
 
-      if (obj.name == null || obj.name == "") {
+      if (user.current().displayName == null || user.current().displayName == "") {
         menu.gotoSetName();
       } else {
         menu.gotoMain();
@@ -752,8 +761,8 @@ const menu = new function() {
   }
 
   this.setName = function(name, callback = function() {}) {
-    user.doc().collection("tshoot").doc("settings").update({
-      name: name
+    user.current().updateProfile({
+      displayName: name
     }).then(callback);
   }
 
@@ -776,17 +785,17 @@ const menu = new function() {
     document.addEventListener("keyup", updateKeyConf, false);
   }
 
-  this.submitScore = function() {
+  this.submitScore = function(callback = function() {}) {
     var db = firebase.firestore();
 
     var score = {};
 
     score[user.current().uid.substring(0, 4)] = {
-      name: game.userData.name,
+      name: user.current().displayName,
       score: game.score
     };
 
-    db.collection("tshoot").doc("Scoreboard").update(score);
+    db.collection("tshoot").doc("Scoreboard").update(score).then(callback);
   }
 
   this.gotoMain = function() {
@@ -806,7 +815,10 @@ const menu = new function() {
   this.gotoControls = function() {
     try {
       document.removeEventListener("keyup", updateKeyConf);
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+
+    }
   }
   this.gotoScoreBoard = function() {
     var db = firebase.firestore();
