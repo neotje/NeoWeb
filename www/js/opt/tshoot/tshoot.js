@@ -816,9 +816,21 @@ const menu = new function() {
     try {
       document.removeEventListener("keyup", updateKeyConf);
     } catch (e) {
-      console.error(e);
+      console.warn(e);
 
     }
+
+    $("#tshoot .controls .up button").text(game.userData.keys.up);
+    $("#tshoot .controls .down button").text(game.userData.keys.down);
+    $("#tshoot .controls .left button").text(game.userData.keys.left);
+    $("#tshoot .controls .right button").text(game.userData.keys.right);
+    $("#tshoot .controls .exit button").text(game.userData.keys.exit);
+
+    $("#tshoot .menu .setName").hide();
+    $("#tshoot .menu .controls").show();
+    $("#tshoot .menu .gameOver").hide();
+    $("#tshoot .menu .main").hide();
+    $("#tshoot .menu .scoreboard").hide();
   }
   this.gotoScoreBoard = function() {
     var db = firebase.firestore();
