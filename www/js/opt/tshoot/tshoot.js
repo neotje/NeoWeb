@@ -329,7 +329,9 @@ class Enemy {
       this.destroy = true;
     }
 
-    this.angle = Math.atan2((this.target.y - this.y), (this.target.x - this.x));
+    if (this.target) {
+      this.angle = Math.atan2((this.target.y - this.y), (this.target.x - this.x));
+    }
 
     // calculate new position
     var Dx = this.speed * Math.cos(this.angle);
