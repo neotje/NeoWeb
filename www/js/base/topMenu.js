@@ -1,3 +1,15 @@
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    topMenu.showTopMenuUser();
+  } else {
+    $.getJSON("./config.json", function(data) {
+      if (data.user.required == false) {
+        topMenu.showTopMenuAuthBtn();
+      }
+    });
+  }
+});
+
 const topMenu = new function() {
   this.showTopMenuAuthBtn = function() {
     $("#topMenu .user").hide(300);
@@ -27,18 +39,6 @@ const topMenu = new function() {
     });
   }
 }
-
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    topMenu.showTopMenuUser();
-  } else {
-    $.getJSON("./config.json", function(data) {
-      if (data.user.required == false) {
-        topMenu.showTopMenuAuthBtn();
-      }
-    });
-  }
-});
 
 $(document).ready(function() {
   $("#topMenu .authBtn").hide();

@@ -1,5 +1,6 @@
 {
   "user": {
     "required": true
-  }
+  },
+  "naughtyBoys": true
 }
