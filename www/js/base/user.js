@@ -188,8 +188,6 @@ $(document).ready(function() {
     e.preventDefault();
   });
 
-  $("#user").hide();
-
   $("#user .container .topMenu .login").click(function() {
     user.formSwitchTo("login");
   });
