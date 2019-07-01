@@ -8,10 +8,15 @@
       "description": "Tshoot is a 2D shooter, where you need to defend yourself.",
       "link": "/projects/tshoot"
     },
-    "More coming": {
+    "queueMusic": {
       "img": "/img/F-coming-soon.png",
-      "description": "More projects will be added.",
-      "link": "/"
+      "description": "Somthing with music on parties",
+      "link": "/projects/queueMusic"
+    },
+    "Videos": {
+      "img": "/img/F-videos.png",
+      "description": "All my Videos",
+      "link": "/videos"
     }
   },
   "naughtyBoys": false

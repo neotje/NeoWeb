@@ -654,7 +654,9 @@ const game = new function() {
     //game.loadConf();
 
     document.addEventListener("keydown", keyDownHandler, false);
+    //$(document).keydown(keyDownHandler);
     document.addEventListener("keyup", keyUpHandler, false);
+    //$(document).keyup(keyUpHandler);
     game.canvas.addEventListener("mousemove", game.mouse.update, false);
 
     reset();
@@ -696,6 +698,14 @@ const game = new function() {
     game.ctx.fillStyle = "black";
     game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 
+    // check if a entity needs to be destroyed;
+    for (let i in game.entities) {
+      if (game.entities[i].destroy == true) {
+        //console.log("destroyed", game.entities[i]);
+        game.entities.splice(i, 1);
+      }
+    }
+
     // get player count
     game.playerCount = 0;
     for (let entity of game.entities) {
@@ -706,14 +716,6 @@ const game = new function() {
 
     if (game.playerCount == 0 || game.keys.exit.pressed) {
       game.stop();
-    }
-
-    // check if a entity needs to be destroyed;
-    for (let i in game.entities) {
-      if (game.entities[i].destroy == true) {
-        //console.log("destroyed", game.entities[i]);
-        game.entities.splice(i, 1);
-      }
     }
 
     // update every entity;
