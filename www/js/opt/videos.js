@@ -44,6 +44,6 @@ $(document).ready(function() {
 
     $(document).scroll(function() {
       animation.seek(animation.duration * (($(document).scrollTop() + seekOffset) / ($(document).height() - $(window).height() + seekOffset)));
-    })
+    });
   });
 });
