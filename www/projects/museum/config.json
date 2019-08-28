@@ -1,0 +1,28 @@
+{
+  "questions": {
+    "easy": {
+      "1": {
+        "question": "Hoe maak je een google taart?",
+        "answer": "2",
+        "letter": "a",
+        "options": {
+          "1": "je mengt wat ingredienten en doet het in de oven.",
+          "2": "met g meel.",
+          "3": "of je zoekt het recept op in google."
+        }
+      }
+    },
+    "hard": {
+      "1": {
+        "question": "Spacex is...",
+        "answer": "3",
+        "letter": "b",
+        "options": {
+          "1": "spacend",
+          "2": "iets met fietsen",
+          "3": "ruimte geval"
+        }
+      }
+    }
+  }
+}

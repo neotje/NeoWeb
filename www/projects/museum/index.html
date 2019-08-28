@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Museum geen idee</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="/js/lib/jquery.js" charset="utf-8"></script>
+  <script src="/js/lib/anime.js" charset="utf-8"></script>
+  <script src="/js/opt/museum.js" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="/css/base/typography.css">
+  <style media="screen">
+    body,
+    .w3-display-container {
+      height: 100vh;
+    }
+
+    .w3-display-middle {
+      min-width: 250px;
+      max-width: 100vw;
+    }
+
+    .letter {
+      font-size: 3rem;
+      line-height: 3rem;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="w3-display-container">
+    <div class="w3-display-middle w3-card-4" style="display:none;">
+      <div class="w3-container w3-blue top">
+        <h4 class="question">Vraag?</h4>
+      </div>
+      <form name="answers" class="w3-container options" onsubmit="check();">
+        <button class="control-button w3-btn w3-blue w3-margin-bottom" type="submit">Controleren</button>
+      </form>
+      <div class="w3-container good w3-green" style="display:none;">
+        <p>Goed bezig!</p>
+        <p>Je letter is:</p>
+        <p class="letter"></p>
+      </div>
+      <div class="w3-container wrong w3-red" style="display:none;">
+        <p>Fout!</p>
+        <p>De volgende keer beter.</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
