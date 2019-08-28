@@ -9,6 +9,10 @@ var colors = [
   "w3-gray"
 ];
 
+var Duration = {
+  card: 500
+}
+
 $(document).ready(function() {
   $("form").submit(function(e) {
     e.preventDefault();
@@ -32,9 +36,23 @@ $(document).ready(function() {
         <label>moeilijk</label>
       </p>
     `);
-
+    $(".control-button").text("Ok");
     $(".question").text("Moeilijkheid");
-    $(".w3-display-middle").fadeIn(300);
+    anime({
+      targets: ".w3-display-middle",
+      duration: Duration.card,
+      opacity: 1,
+      left: "50%",
+      easing: "easeOutQuart",
+      complete: function(){
+        anime({
+          targets: ".control-button",
+          duration: 300,
+          opacity: 1,
+          easing: "linear"
+        });
+      }
+    });
     return;
   }
 
@@ -46,42 +64,56 @@ $(document).ready(function() {
       if (data.questions[getCookie("difficulty")][q]) {
         var data = data.questions[getCookie("difficulty")][q];
 
-        $("form").hide(300, function() {
-          $(".letter").text(data.letter);
-          $(".good").show(300);
-        });
+        $(".letter").text(data.letter);
+        $("form").hide();
+        $(".good").show();
       }
     });
   }
 
   if (getCookie("answer" + q) == "wrong") {
-    $("form").hide(300, function() {
-      $(".wrong").show(300);
-    });
+    $("form").hide();
+    $(".wrong").show();
   }
 
   $.getJSON("./config.json", function(data) {
     //console.log(data.questions[q]);
     console.log(data);
     if (data.questions[getCookie("difficulty")][q]) {
-      var data = data.questions[getCookie("difficulty")][q];
-      $(".question").text(data.question);
+      var question = data.questions[getCookie("difficulty")][q];
+      $(".question").text(question.question);
 
-      for (var key in data.options) {
-        var option = data.options[key];
+      for (var key in question.options) {
+        var option = question.options[key];
 
         //console.log(key, option);
 
         $(".options").prepend(`
           <p>
-            <input class="w3-radio" type="radio" name="option" value="`+key+`">
+            <input class="w3-radio" type="radio" name="option" value="`+key+`" required>
             <label>`+option+`</label>
           </p>
         `);
       }
     }
-
-    $(".w3-display-middle").fadeIn(300);
+    anime({
+      targets: ".w3-display-middle",
+      duration: Duration.card,
+      opacity: 1,
+      left: "50%",
+      easing: "easeOutQuart",
+      complete: function(){
+        if (data.questions[getCookie("difficulty")][q]) {
+          //$(".control-button").fadeIn(300);
+          anime({
+            targets: ".control-button",
+            duration: 300,
+            opacity: 1,
+            easing: "linear"
+          })
+        }
+      }
+    });
   });
 });
 
@@ -90,7 +122,7 @@ function check() {
 
   if (finalAnswer == "easy" || finalAnswer == "hard") {
     setCookie("difficulty", finalAnswer, 1);
-    document.location.href = document.location.href;
+    goto(document.location.href);
     return;
   }
 
@@ -103,21 +135,28 @@ function check() {
     if (data.questions[getCookie("difficulty")][q]) {
       var data = data.questions[getCookie("difficulty")][q];
 
-      console.log(finalAnswer, data.answer);
-      if (finalAnswer == data.answer) {
-        $("form").hide(300, function() {
-          $(".letter").text(data.letter);
-          $(".good").show(300);
-        });
+      anime({
+        targets: ".w3-display-middle",
+        left: "200%",
+        easing: "easeInQuart",
+        duration: Duration.card,
+        direction: "alternate",
+        loop: 1,
+        loopComplete: function(){
+          console.log(finalAnswer, data.answer);
 
-        setCookie("answer" + q, "good", 2);
-      } else {
-        $("form").hide(300, function() {
-          $(".wrong").show(300);
-        });
+          $("form").hide();
 
-        setCookie("answer" + q, "wrong", 2);
-      }
+          if (finalAnswer == data.answer) {
+            $(".letter").text(data.letter);
+            $(".good").show();
+            setCookie("answer" + q, "good", 2);
+          } else {
+            $(".wrong").show();
+            setCookie("answer" + q, "wrong", 2);
+          }
+        }
+      });
     }
   });
 }
@@ -155,4 +194,17 @@ function reset() {
     delete_cookie("answer" + i);
   }
   delete_cookie('difficulty');
+  goto(document.location.href);
+}
+
+function goto(url) {
+  anime({
+    targets: ".w3-display-middle",
+    left: "200%",
+    easing: "easeInQuart",
+    duration: Duration.card,
+    complete: function(){
+      document.location.href = url;
+    }
+  });
 }
