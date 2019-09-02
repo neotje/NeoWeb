@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Birds</title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
+
+  <!-- STYLESHEETS -->
+
+  <!-- SCRIPTS -->
+  <script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous">
+  </script>
+  <script type="text/javascript">
+    Sentry.init({
+      dsn: 'https://b5b2e6ff763b45e1b85e7691a4084a2d@sentry.io/1491138'
+    });
+  </script>
+  <!-- lib -->
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyBshVsKztLIRLbwmLELrOZbp7J5Wp0ufqg",
+      authDomain: "neohub-7fdd1.firebaseapp.com",
+      databaseURL: "https://neohub-7fdd1.firebaseio.com",
+      projectId: "neohub-7fdd1",
+      storageBucket: "neohub-7fdd1.appspot.com",
+      messagingSenderId: "472880578942",
+      appId: "1:472880578942:web:58e4e22c00d99bc6"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script src="/js/lib/jquery.js" charset="utf-8"></script>
+  <script src="/js/lib/anime.js" charset="utf-8"></script>
+  <script src="/js/lib/spotify-web-api.js" charset="utf-8"></script>
+  <!-- BASE scripts -->
+  <script src="/js/base/user.js" charset="utf-8"></script>
+  <script src="/js/base/topMenu.js" charset="utf-8"></script>
+  <script src="/js/base/notifier.js" charset="utf-8"></script>
+  <script src="/js/base/naughty-boys.js" charset="utf-8"></script>
+  <!-- OPT scripts -->
+  <script src="/js/opt/birds.js" charset="utf-8"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!-- base css -->
+  <link rel=" stylesheet" href="/css/base/normalize.css">
+  <link rel="stylesheet" href="/css/base/typography.css">
+  <link rel="stylesheet" href="/css/base/color.css">
+  <link rel="stylesheet" href="/css/base/topMenu.css">
+  <link rel="stylesheet" href="/css/base/user.css">
+  <link rel="stylesheet" href="/css/base/notifier.css">
+  <!-- opt css -->
+  <link rel="stylesheet" href="/css/opt/footer.css">
+  <link rel="stylesheet" href="/css/opt/birds.css">
+
+</head>
+
+<body>
+  <div id="user">
+  </div>
+
+  <div id="topMenu">
+  </div>
+
+  <div id="birds">
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </div>
+
+  <div id="footer">
+  </div>
+
+  <!-- LOAD -->
+  <script type="text/javascript">
+    $.ajaxSetup({
+      async: false
+    });
+    $("#user").load("/html/user.html");
+    $("#topMenu").load("/html/topMenu.html");
+    $("#footer").load("/html/footer.html");
+
+    $.ajaxSetup({
+      async: true
+    });
+  </script>
+</body>
+
+</html>

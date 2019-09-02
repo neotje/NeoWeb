@@ -1,3 +1,14 @@
+// IDEA: better variable naming.
+// IDEA: better value naming.
+
+var $question = $(".question");
+var $form = $("form");
+var $options = $(".options");
+var $submitBtn = $(".control-button");
+var $letter = $(".letter");
+var $good = $(".good");
+var $wrong = $(".wrong");
+
 var colors = [
   "w3-pink",
   "w3-purple",
@@ -14,19 +25,31 @@ var Duration = {
 }
 
 $(document).ready(function() {
-  $("form").submit(function(e) {
+  $question = $(".question");
+  $form = $("form");
+  $options = $(".options");
+  $submitBtn = $(".control-button");
+  $letter = $(".letter");
+  $good = $(".good");
+  $wrong = $(".wrong");
+
+  // prevent form from refreshing the page
+  $form.submit(function(e) {
     e.preventDefault();
   });
 
+  // get question number from url
   var url = new URL(document.location.href);
   var q = url.searchParams.get("q");
+
+  // chose random color for header and submit button.
   var c = colors[Math.floor(Math.random() * (colors.length-1))];
+  $(".top, .control-button").addClass(c);
 
-  $(".top").addClass(c);
-  $(".control-button").addClass(c);
-
+  // if difficulty is empty then ask the user to enter a difficulty
   if (getCookie("difficulty") == "") {
-    $(".options").prepend(`
+    // insert difficulty options.
+    $options.prepend(`
       <p>
         <input class="w3-radio" type="radio" name="option" value="easy" required>
         <label>makkelijk</label>
@@ -36,8 +59,11 @@ $(document).ready(function() {
         <label>moeilijk</label>
       </p>
     `);
-    $(".control-button").text("Ok");
-    $(".question").text("Moeilijkheid");
+    // set submit button text.
+    $submitBtn.text("Ok");
+    // set question text.
+    $question.text("Moeilijkheid");
+
     anime({
       targets: ".w3-display-middle",
       duration: Duration.card,
@@ -56,6 +82,8 @@ $(document).ready(function() {
     return;
   }
 
+  // if answer is already anwered and the answer was correct then show the good
+  // element with the corresponding letter.
   if (getCookie("answer" + q) == "good") {
     $.getJSON("./config.json", function(data){
       var url = new URL(document.location.href);
@@ -64,16 +92,16 @@ $(document).ready(function() {
       if (data.questions[getCookie("difficulty")][q]) {
         var data = data.questions[getCookie("difficulty")][q];
 
-        $(".letter").text(data.letter);
-        $("form").hide();
-        $(".good").show();
+        $letter.text(data.letter);
+        $form.hide();
+        $good.show();
       }
     });
   }
 
   if (getCookie("answer" + q) == "wrong") {
-    $("form").hide();
-    $(".wrong").show();
+    $form.hide();
+    $wrong.show();
   }
 
   $.getJSON("./config.json", function(data) {
@@ -88,7 +116,7 @@ $(document).ready(function() {
 
         //console.log(key, option);
 
-        $(".options").prepend(`
+        $options.prepend(`
           <p>
             <input class="w3-radio" type="radio" name="option" value="`+key+`" required>
             <label>`+option+`</label>
@@ -145,14 +173,14 @@ function check() {
         loopComplete: function(){
           console.log(finalAnswer, data.answer);
 
-          $("form").hide();
+          $form.hide();
 
           if (finalAnswer == data.answer) {
-            $(".letter").text(data.letter);
-            $(".good").show();
+            $letter.text(data.letter);
+            $good.show();
             setCookie("answer" + q, "good", 2);
           } else {
-            $(".wrong").show();
+            $wrong.show();
             setCookie("answer" + q, "wrong", 2);
           }
         }
@@ -198,12 +226,14 @@ function reset() {
 }
 
 function goto(url) {
+  // slide everthing to the right out of the window
   anime({
     targets: ".w3-display-middle",
     left: "200%",
     easing: "easeInQuart",
     duration: Duration.card,
     complete: function(){
+      // then go the url.
       document.location.href = url;
     }
   });

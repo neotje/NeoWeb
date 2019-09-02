@@ -13,6 +13,11 @@
       "description": "Somthing with music on parties",
       "link": "/projects/queueMusic"
     },
+    "Birds": {
+      "img": "/img/F-birds.png",
+      "description": "Birds flying in flocks.",
+      "link": "/projects/birds"
+    },
     "Videos": {
       "img": "/img/F-videos.png",
       "description": "All my Videos",
