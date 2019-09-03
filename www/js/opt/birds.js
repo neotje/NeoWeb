@@ -31,7 +31,7 @@ $(document).ready(function(){
 
   lastTime = performance.now();
 
-  loop();
+  //loop();
 });
 
 class Bird {
