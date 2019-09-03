@@ -2,6 +2,8 @@ var cnv;
 
 var flock;
 
+var play = true;
+
 function setup() {
   //createCanvas(
   //  document.getElementById("birds").clientHeight,
@@ -11,12 +13,15 @@ function setup() {
 
   background(20);
 
-  flock = new Flock(100);
+  flock = new Flock();
+  flock.addBoids(100)
 }
 
 function draw() {
-  background(20)
-  flock.update();
+  if (play) {
+    background(20)
+    flock.update();
+  }
 }
 
 class Flock {
@@ -39,15 +44,32 @@ class Flock {
   }
 }
 
+class obj {
+  constructor(){
+    this.p = createVector(windowWidth/3, windowHeight/3);
+    this.r = 100.0;
+  }
+
+  update(){
+    circle(this.p.x, this.p.y, this.r);
+  }
+}
+
 class Boid {
   constructor() {
     this.acc = createVector(0, 0)
     //this.p = createVector(random(0, windowWidth), random(0, windowHeight));
-    this.p = createVector(windowWidth / 2, windowHeight / 2);
-    this.v = createVector(random(-1, 1), random(-1, 1));
+    this.p = createVector(random(windowWidth), random(windowHeight));
+    this.v = createVector(random(0, 1), random(0, 1));
     this.r = 5.0;
-    this.maxSpeed = 3;
-    this.maxForce = 0.025;
+    this.maxSpeed = 5;
+    this.maxForce = 0.06;
+
+    this.minSep = 35;
+    this.maxAli = 80;
+    this.maxCen = 80;
+
+    this.color = random(100, 256)
   }
 
   update(boids) {
@@ -55,7 +77,7 @@ class Boid {
     let ali = this.align(boids);  // alignment
     let cen = this.center(boids);
 
-    sep.mult(1.5);
+    sep.mult(1.6);
     ali.mult(1.0);
     cen.mult(1.0);
 
@@ -81,14 +103,14 @@ class Boid {
   }
 
   sep(boids) {
-    let minSep = 30;
+    let minSep = this.minSep;
     let steer = createVector(0, 0);
     let count = 0;
 
     for (let b of boids) {
       let d = p5.Vector.dist(this.p, b.p);
 
-      if (d > 0 && d < minSep) {
+      if (d > 0 && d < b.r + minSep) {
         let delta = p5.Vector.sub(this.p, b.p);
         delta.normalize();
         delta.div(d);
@@ -111,7 +133,7 @@ class Boid {
   }
 
   align(boids) {
-    let maxDist = 60;
+    let maxDist = this.maxAli;
     let sum = createVector(0,0);
     let count = 0;
 
@@ -139,7 +161,7 @@ class Boid {
   }
 
   center(boids) {
-    let maxDist = 60;
+    let maxDist = this.maxCen;
     let sum = createVector(0, 0);
     let count = 0;
 
@@ -147,7 +169,7 @@ class Boid {
       let d = p5.Vector.dist(this.p, b.p);
 
       if (d > 0 && d < maxDist) {
-        sum.add(b.v);
+        sum.add(b.p);
         count++;
       }
     }
@@ -155,13 +177,16 @@ class Boid {
     if (count > 0) {
       sum.div(count);
 
-      let target = p5.Vector.sub(sum, this.p);
+      let target = p5.Vector.sub(this.p, sum);
       target.normalize();
       target.mult(this.maxSpeed);
 
-      let steer = p5.Vector.sub(target, this.v);
+      let steer = p5.Vector.sub(this.v, target);
       steer.limit(this.maxForce);
 
+      stroke("red");
+      //line(this.p.x, this.p.y, this.p.x + (sum.x * 100), this.p.y + (sum.y * 100));
+      //console.log(sum.x, sum.y);
       return steer;
     } else {
       return createVector(0, 0);
@@ -171,8 +196,8 @@ class Boid {
   draw() {
     // Draw a triangle rotated in the direction of velocity
     let theta = this.v.heading() + radians(90);
-    fill(256);
-    stroke(256);
+    fill(this.color);
+    stroke(this.color);
     push();
     translate(this.p.x, this.p.y);
     rotate(theta);

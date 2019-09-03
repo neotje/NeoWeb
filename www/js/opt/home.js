@@ -1,7 +1,7 @@
 const home = new function() {
   this.genSize = function() {
     $("#home .cover").height((0.75 * $(window).height()) + "px");
-    $("#home .container .featured .items").height((0.9 * $("#home .container .featured .items .item").width()) + "px");
+    //$("#home .container .featured .items").height((0.9 * $("#home .container .featured .items .item").width()) + "px");
   }
 
   this.genFeatured = function() {
@@ -12,10 +12,10 @@ const home = new function() {
 
         for (let item in fData.featured) {
           var title = fData.featured[item].title;
-          var elem = $("#home .container .featured .items ." + item);
+          var $item = $("#home .container .featured .items ." + item);
 
           if (title == "") {
-            elem.hide();
+            $item.hide();
             continue;
           }
 
@@ -23,10 +23,14 @@ const home = new function() {
 
           var props = pData.projects[title];
 
-          elem.attr("onclick", "window.location.href = '" + props.link + "'")
-          elem.children("img").attr("src", props.img);
-          elem.children("h6").text(title);
-          elem.children("p").text(props.description);
+          $item.off("click");
+          $item.click(function(){
+            nav.gotoProject(props.link, item);
+          });
+          //$item.attr("onclick", "nav.gotoProject('" + props.link + ", this');")
+          $item.children("img").attr("src", props.img);
+          $item.children("h6").text(title);
+          $item.children("p").text(props.description);
         }
       });
     });

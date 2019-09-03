@@ -13,12 +13,15 @@ const projects = new function() {
 
   this.genList = function() {
     $.getJSON("./config.json", function(data) {
+      var i = 0;
       for (let title in data.projects) {
         var props = data.projects[title];
 
-        var html = "<div class='item' onclick='window.location.href = \"";
-        html += props.link;
-        html += "\"'><img src='";
+        let itemClass = "item-" + i;
+        let url = props.link
+
+        var html = "<div class='item item-"+i+"'";
+        html += "><img src='";
         html += props.img;
         html += "'><h6>";
         html += title;
@@ -27,7 +30,14 @@ const projects = new function() {
         html += props.description;
         html += "</p></div>";
 
-        $("#projects .grid").append(html);
+        var $item = $(html);
+        //$item.off("click");
+        $item.click(function(){
+          nav.gotoProject(url, itemClass);
+        });
+        $("#projects .grid").append($item);
+
+        i++;
       }
     });
   }

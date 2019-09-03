@@ -15,32 +15,57 @@ const user = new function() {
     return db.collection('users').doc(this.current().uid);
   }
 
-  this.formSwitchTo = function(form) {
+  this.formSwitchTo = function(form, instant = false) {
+    var duration1 = 75;
+    var duration2 = 150;
+
+    if (instant) {
+      duration1 = 1;
+      duration2 = 1;
+    }
     if (form == "login") {
       $("#user .container .topMenu .login").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .register").css("border-bottom-color", "white");
 
-      $("#user .container .forms .register").fadeOut(75, function() {
-        $("#user .container .forms .login").fadeIn(150);
+      $("#user .container .forms .register").fadeOut(duration1, function() {
+        $("#user .container .forms .login").fadeIn(duration2);
       });
     }
     if (form == "register") {
       $("#user .container .topMenu .register").css("border-bottom-color", "var(--Secondary");
       $("#user .container .topMenu .login").css("border-bottom-color", "white");
 
-      $("#user .container .forms .login").fadeOut(75, function() {
-        $("#user .container .forms .register").fadeIn(150);
+      $("#user .container .forms .login").fadeOut(duration1, function() {
+        $("#user .container .forms .register").fadeIn(duration2);
       });
     }
   }
 
   this.showAuthForm = function(callback = function() {}) {
-    This.formSwitchTo("login");
-    $("#user").fadeIn(150, callback);
+    This.formSwitchTo("login", true);
+    $("#user").css("opacity", "0");
+    $("#user").show();
+
+    anime({
+      targets: "#user",
+      opacity: [0,1],
+      duration: 250,
+      easing: "cubicBezier(.4, 0, .2, 1)",
+      complete: callback
+    });
   }
 
   this.hideAuthForm = function(callback = function() {}) {
-    $("#user").fadeOut(75, callback);
+    anime({
+      targets: "#user",
+      opacity: [1,0],
+      duration: 200,
+      easing: "cubicBezier(.4, 0, .2, 1)",
+      complete: function(){
+        $("#user").hide();
+        callback();
+      }
+    });
   }
 
   this.login = function() {
