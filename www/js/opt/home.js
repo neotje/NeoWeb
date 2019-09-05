@@ -23,9 +23,11 @@ const home = new function() {
 
           var props = pData.projects[title];
 
+          let link = props.link;
+
           $item.off("click");
           $item.click(function(){
-            nav.gotoProject(props.link, item);
+            nav.gotoProject(link, item);
           });
           //$item.attr("onclick", "nav.gotoProject('" + props.link + ", this');")
           $item.children("img").attr("src", props.img);

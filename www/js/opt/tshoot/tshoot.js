@@ -612,6 +612,38 @@ const game = new function() {
     return numbers;
   }
 
+  this.activeteHak = function(){
+    game.canvas.removeEventListener("mousemove", game.mouse.update);
+
+    setInterval(function(){
+      var target;
+      var player;
+      var closest = 100000;
+      for (let entity of game.entities) {
+        if (entity.type == "player") {
+          game.shoot(entity);
+          player = entity;
+        }
+      }
+
+      for (var entity of game.entities) {
+        if (entity.type == "enemy") {
+          if (game.distance(player.x, player.y, entity.x, entity.y) < closest) {
+            closest = game.distance(player.x, player.y, entity.x, entity.y);
+            target = entity;
+          }
+        }
+      }
+
+      if (target) {
+        game.mouse.y = target.y;
+        game.mouse.x = target.x;
+        //this.angle = Math.atan2(game.mouse.y - this.y, game.mouse.x - this.x);
+
+      }
+    }, 1);
+  }
+
   this.shoot = function(This) {
     //console.log("shooting");
 

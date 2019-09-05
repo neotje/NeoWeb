@@ -1,0 +1,18 @@
+{
+  "user": {
+    "required": false
+  },
+  "sims": {
+    "Birds": {
+      "img": "/img/F-birds.png",
+      "description": "Birds flying in flocks",
+      "link": "/projects/simulations/birds/boids.html"
+    },
+    "Turn Fraction": {
+      "img": "/img/F-coming-soon.png",
+      "description": "just a cool visualisation of turn fractions",
+      "link": "/projects/simulations/turnFraction/turnFraction.html"
+    }
+  },
+  "naughtyBoys": false
+}

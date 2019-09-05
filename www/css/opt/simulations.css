@@ -1,0 +1,63 @@
+html {
+  scroll-behavior: smooth;
+}
+
+#simulations iframe {
+  width: 100%;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  border: none;
+}
+
+
+#simulations {
+  z-index: 0;
+
+  width: 100%;
+  min-height: 75vh;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
+
+#simulations h2 {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#simulations .grid {
+  margin-right: auto;
+  margin-left: auto;
+  width: 90%;
+
+  display: grid;
+
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 1rem;
+}
+
+#simulations .grid .item {
+  padding: 1rem;
+  border-radius: 2px;
+  transition: all .2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#simulations .grid .item:hover {
+  cursor: pointer;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+}
+
+#simulations .grid .item img {
+  width: 100%;
+  height: calc(40%-2rem);
+}
+
+#simulations .grid .item h6 {
+  margin: 0;
+  margin-top: 1rem;
+
+  padding: 0;
+}
