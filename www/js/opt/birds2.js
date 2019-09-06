@@ -14,6 +14,8 @@ function setup() {
   //);
   cnv = createCanvas(windowWidth, windowHeight);
 
+  //cursor("none");
+
   background(20);
 
   collideDebug(true)
@@ -21,11 +23,8 @@ function setup() {
   flock = new Flock();
   flock.addBoids(100);
 
-  light = new Light(width/2, 0, 30);
-  light.add(2000);
-
-  light2 = new Light(width/2 + 5, 0, 40);
-  light2.add(2000);
+  light = new Light(width/2, 0, 45);
+  light.add((width + height )/2);
 
   frameRate(60);
 
@@ -39,6 +38,8 @@ function setup() {
 function draw() {
   var hit;
   if (play) {
+    light.x = mouseX;
+    light.y = mouseY;
     background(20)
     flock.update();
     light.update(flock.boids);
@@ -96,6 +97,8 @@ class Light {
 
   update(boids) {
     for (let r of this.rays) {
+      r.x = this.x;
+      r.y = this.y;
       r.update();
     }
 
@@ -135,6 +138,7 @@ class Light {
 
     fill(this.color);
     stroke(this.color);
+    smooth();
     beginShape();
     for (let r of this.rays) {
       vertex(r.p.x, r.p.y);
@@ -307,27 +311,17 @@ class Boid {
     translate(this.p.x, this.p.y);
     rotate(theta);
 
-    var a = this.r * 2;
-
     beginShape(TRIANGLES);
     vertex(0, -this.r * 2);
-    vertex(-this.r, a);
-    vertex(this.r, a);
+    vertex(-this.r, this.r * 2);
+    vertex(this.r, this.r * 2);
     endShape(CLOSE);
 
-    //addBoundry(this.p.x, this.p.y - (this.r * 2), this.p.x - this.r, this.p.y + a, theta);
-    //addBoundry(this.p.x - this.r, this.p.y + a, this.p.x + this.r, this.p.y + a, theta);
-
     this.body = {
-      p1: createVector(0, -this.r * 2).rotate(theta).add(this.p.x, this.p.y),
-      p2: createVector(-this.r, a).rotate(theta).add(this.p.x, this.p.y),
-      p3: createVector(this.r, a).rotate(theta).add(this.p.x, this.p.y)
+      p1: createVector(0, -(this.r+1) * 2).rotate(theta).add(this.p.x, this.p.y),
+      p2: createVector(-(this.r+1), (this.r+1) * 2).rotate(theta).add(this.p.x, this.p.y),
+      p3: createVector((this.r+1), (this.r+1) * 2).rotate(theta).add(this.p.x, this.p.y)
     }
-    //this.body = [
-    //  createVector(0, -this.r * 2).rotate(theta).add(this.p.x, this.p.y),
-    //  createVector(-this.r, a).rotate(theta).add(this.p.x, this.p.y),
-    //  createVector(this.r, a).rotate(theta).add(this.p.x, this.p.y)
-    //];
     pop();
   }
 }
